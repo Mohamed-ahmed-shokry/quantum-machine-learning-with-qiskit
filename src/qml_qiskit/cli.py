@@ -19,7 +19,12 @@ def build_parser() -> argparse.ArgumentParser:
         description="Compare a classical SVC with a Qiskit fidelity-kernel QSVC.",
     )
     parser.add_argument("--samples", type=int, default=60, help="total dataset size (default: 60)")
-    parser.add_argument("--noise", type=float, default=0.12, help="moon dataset noise (default: 0.12)")
+    parser.add_argument(
+        "--noise",
+        type=float,
+        default=0.12,
+        help="moon dataset noise (default: 0.12)",
+    )
     parser.add_argument(
         "--test-size",
         type=float,
