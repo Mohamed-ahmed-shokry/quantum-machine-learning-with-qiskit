@@ -57,6 +57,7 @@ Install the project and run the benchmark:
 ```bash
 python -m pip install --upgrade pip
 python -m pip install -e .
+qml-qiskit --version
 qml-qiskit
 ```
 
