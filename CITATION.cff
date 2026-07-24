@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this educational project, please cite it using this metadata."
+title: "Quantum Machine Learning with Qiskit"
+type: software
+version: 1.0.0
+date-released: "2026-07-24"
+authors:
+  - family-names: Shokry
+    given-names: "Mohamed Ahmed"
+repository-code: "https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit"
+url: "https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit"
+license: Apache-2.0
+keywords:
+  - quantum machine learning
+  - Qiskit
+  - quantum kernel
+  - support vector machine
+  - education
