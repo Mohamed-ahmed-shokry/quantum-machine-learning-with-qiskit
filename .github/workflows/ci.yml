@@ -32,8 +32,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
-      - name: Lint source and tests
-        run: python -m ruff check src tests
+      - name: Lint source, tests, and maintained notebooks
+        run: python -m ruff check src tests notebooks
 
       - name: Run test suite
         run: python -m pytest --cov --cov-report=term-missing
