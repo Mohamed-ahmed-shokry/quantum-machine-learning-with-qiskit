@@ -10,6 +10,7 @@ from pathlib import Path
 from qml_qiskit import __version__
 from qml_qiskit.data import make_moons_split
 from qml_qiskit.models import BenchmarkResult, run_benchmark
+from qml_qiskit.report import render_html_report
 from qml_qiskit.study import StudyResult, run_study
 
 
@@ -58,6 +59,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="also save the complete benchmark result as JSON",
     )
+    parser.add_argument(
+        "--report",
+        type=Path,
+        help="save a self-contained HTML experiment report",
+    )
     return parser
 
 
@@ -96,11 +102,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     serialized = json.dumps(result.as_dict(), indent=2)
 
     if args.output is not None:
-        try:
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(f"{serialized}\n", encoding="utf-8")
-        except OSError as error:
-            parser.error(f"could not write --output {args.output}: {error}")
+        _write_artifact(parser, args.output, f"{serialized}\n", "--output")
+    if args.report is not None:
+        _write_artifact(parser, args.report, render_html_report(result), "--report")
 
     print(serialized if args.as_json else _format_report(result))
     return 0
@@ -184,6 +188,19 @@ def _format_study_report(result: StudyResult) -> str:
         ),
     ]
     return "\n".join(rows)
+
+
+def _write_artifact(
+    parser: argparse.ArgumentParser,
+    path: Path,
+    content: str,
+    option: str,
+) -> None:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    except OSError as error:
+        parser.error(f"could not write {option} {path}: {error}")
 
 
 if __name__ == "__main__":
