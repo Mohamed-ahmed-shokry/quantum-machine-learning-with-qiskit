@@ -37,7 +37,10 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     )
     assert result.classical.fit_seconds_mean >= 0
     assert result.quantum.fit_seconds_mean >= 0
-    assert json.loads(json.dumps(result.as_dict()))["seeds"] == [7, 8, 9]
+    payload = json.loads(json.dumps(result.as_dict()))
+    assert payload["seeds"] == [7, 8, 9]
+    assert payload["schema_version"] == 1
+    assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
 
 
 def test_run_study_rejects_single_run() -> None:

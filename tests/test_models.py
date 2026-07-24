@@ -52,6 +52,8 @@ def test_run_benchmark_returns_serializable_metrics() -> None:
     assert result.quantum.fit_seconds >= 0
     assert result.classical.support_vectors > 0
     assert result.quantum.support_vectors > 0
+    assert payload["schema_version"] == 1
+    assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
     assert payload["quantum_advantage"] == pytest.approx(
         result.quantum.test_accuracy - result.classical.test_accuracy
     )
