@@ -13,6 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 FeatureArray = NDArray[np.float64]
 LabelArray = NDArray[np.int_]
+MAX_RANDOM_SEED = 2**32 - 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,6 +52,8 @@ def make_moons_split(
         raise ValueError("noise must be non-negative")
     if not 0 < test_size < 1:
         raise ValueError("test_size must be between 0 and 1")
+    if not 0 <= seed <= MAX_RANDOM_SEED:
+        raise ValueError(f"seed must be between 0 and {MAX_RANDOM_SEED}")
     test_samples = ceil(samples * test_size)
     if test_samples < 2 or samples - test_samples < 2:
         raise ValueError("test_size must leave at least two samples in each split")

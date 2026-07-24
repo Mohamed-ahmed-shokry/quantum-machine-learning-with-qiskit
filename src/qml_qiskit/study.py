@@ -7,7 +7,7 @@ from math import isclose
 from statistics import fmean, pstdev
 from typing import Any
 
-from qml_qiskit.data import make_moons_split
+from qml_qiskit.data import MAX_RANDOM_SEED, make_moons_split
 from qml_qiskit.models import BenchmarkResult, ModelMetrics, run_benchmark
 
 
@@ -63,6 +63,10 @@ def run_study(
 
     if runs < 2:
         raise ValueError("runs must be at least 2")
+    if base_seed < 0 or base_seed + runs - 1 > MAX_RANDOM_SEED:
+        raise ValueError(
+            f"base_seed and runs must produce seeds between 0 and {MAX_RANDOM_SEED}"
+        )
 
     seeds = tuple(range(base_seed, base_seed + runs))
     benchmarks = tuple(
