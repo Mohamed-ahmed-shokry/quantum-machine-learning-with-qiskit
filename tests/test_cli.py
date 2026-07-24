@@ -7,6 +7,13 @@ import pytest
 from qml_qiskit.cli import main
 
 
+def test_cli_prints_package_version(capsys) -> None:
+    with pytest.raises(SystemExit, match="0"):
+        main(["--version"])
+
+    assert capsys.readouterr().out == "qml-qiskit 1.0.0\n"
+
+
 def test_cli_prints_json_and_writes_result(tmp_path, capsys) -> None:
     output = tmp_path / "nested" / "benchmark.json"
 

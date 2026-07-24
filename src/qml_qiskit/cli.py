@@ -7,6 +7,7 @@ import json
 from collections.abc import Sequence
 from pathlib import Path
 
+from qml_qiskit import __version__
 from qml_qiskit.data import make_moons_split
 from qml_qiskit.models import BenchmarkResult, run_benchmark
 from qml_qiskit.study import StudyResult, run_study
@@ -19,6 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="qml-qiskit",
         description="Compare a classical SVC with a Qiskit fidelity-kernel QSVC.",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--samples", type=int, default=60, help="total dataset size (default: 60)")
     parser.add_argument(
         "--noise",
