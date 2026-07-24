@@ -10,6 +10,7 @@ from qml_qiskit.models import (
     build_quantum_classifier,
     run_benchmark,
 )
+from qml_qiskit.study import MetricSummary, StudyResult, run_study
 
 try:
     __version__ = version("qml-qiskit")
@@ -19,10 +20,13 @@ except PackageNotFoundError:
 __all__ = [
     "BenchmarkResult",
     "DatasetSplit",
+    "MetricSummary",
     "ModelMetrics",
+    "StudyResult",
     "__version__",
     "build_feature_map",
     "build_quantum_classifier",
     "make_moons_split",
     "run_benchmark",
+    "run_study",
 ]
