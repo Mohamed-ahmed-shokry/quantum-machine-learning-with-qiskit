@@ -61,7 +61,7 @@ def make_moons_split(
     )
 
     scaler = MinMaxScaler(feature_range=(0, np.pi))
-    scaled_train = scaler.fit_transform(train_features)
+    scaled_train = np.clip(scaler.fit_transform(train_features), 0, np.pi)
     scaled_test = np.clip(scaler.transform(test_features), 0, np.pi)
 
     return DatasetSplit(
