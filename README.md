@@ -66,8 +66,8 @@ count:
 QML benchmark | 60 samples | 2 features | seed 42
 -------------------------------------------------
 Model                        Train     Test    Fit (s)    SVs
-Classical RBF SVC            0.978    0.867      ...       18
-Quantum fidelity QSVC        0.800    0.867      ...       38
+Classical RBF SVC            0.978    0.867      ...       21
+Quantum fidelity QSVC        0.800    0.867      ...       35
 -------------------------------------------------
 Quantum test-score delta: +0.000
 ```
