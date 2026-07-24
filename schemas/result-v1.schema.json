@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit/raw/main/schemas/result-v1.schema.json",
+  "title": "QML Qiskit experiment artifact",
+  "description": "A single benchmark or repeated paired-study result.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/benchmark"
+    },
+    {
+      "$ref": "#/$defs/study"
+    }
+  ],
+  "$defs": {
+    "modelMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "train_accuracy",
+        "test_accuracy",
+        "fit_seconds",
+        "support_vectors"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "train_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "test_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "fit_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "support_vectors": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "metricSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "runs",
+        "train_accuracy_mean",
+        "train_accuracy_std",
+        "test_accuracy_mean",
+        "test_accuracy_std",
+        "fit_seconds_mean",
+        "fit_seconds_std",
+        "support_vectors_mean",
+        "support_vectors_std"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runs": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "train_accuracy_mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "train_accuracy_std": {
+          "type": "number",
+          "minimum": 0
+        },
+        "test_accuracy_mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "test_accuracy_std": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fit_seconds_mean": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fit_seconds_std": {
+          "type": "number",
+          "minimum": 0
+        },
+        "support_vectors_mean": {
+          "type": "number",
+          "minimum": 0
+        },
+        "support_vectors_std": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python",
+        "platform",
+        "packages"
+      ],
+      "properties": {
+        "python": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packages": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "qml-qiskit",
+            "qiskit",
+            "qiskit-machine-learning",
+            "numpy",
+            "scikit-learn"
+          ],
+          "properties": {
+            "qml-qiskit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qiskit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "qiskit-machine-learning": {
+              "type": "string",
+              "minLength": 1
+            },
+            "numpy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scikit-learn": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "benchmarkRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "samples",
+        "features",
+        "seed",
+        "feature_map_reps",
+        "classical",
+        "quantum",
+        "quantum_advantage"
+      ],
+      "properties": {
+        "samples": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "features": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "feature_map_reps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "classical": {
+          "$ref": "#/$defs/modelMetrics"
+        },
+        "quantum": {
+          "$ref": "#/$defs/modelMetrics"
+        },
+        "quantum_advantage": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "samples",
+        "features",
+        "seed",
+        "feature_map_reps",
+        "classical",
+        "quantum",
+        "quantum_advantage",
+        "schema_version",
+        "runtime"
+      ],
+      "properties": {
+        "samples": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "features": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "feature_map_reps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "classical": {
+          "$ref": "#/$defs/modelMetrics"
+        },
+        "quantum": {
+          "$ref": "#/$defs/modelMetrics"
+        },
+        "quantum_advantage": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        }
+      }
+    },
+    "study": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "samples",
+        "features",
+        "seeds",
+        "feature_map_reps",
+        "classical",
+        "quantum",
+        "quantum_advantage_mean",
+        "quantum_advantage_std",
+        "quantum_wins",
+        "ties",
+        "classical_wins",
+        "benchmarks",
+        "schema_version",
+        "runtime"
+      ],
+      "properties": {
+        "samples": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "features": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "seeds": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        },
+        "feature_map_reps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "classical": {
+          "$ref": "#/$defs/metricSummary"
+        },
+        "quantum": {
+          "$ref": "#/$defs/metricSummary"
+        },
+        "quantum_advantage_mean": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "quantum_advantage_std": {
+          "type": "number",
+          "minimum": 0
+        },
+        "quantum_wins": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ties": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "classical_wins": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "benchmarks": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/benchmarkRun"
+          }
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        }
+      }
+    }
+  }
+}
