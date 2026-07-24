@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qml-qiskit"
-version = "0.1.0"
+version = "1.0.0"
 description = "Reproducible quantum machine-learning experiments with modern Qiskit primitives"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["qiskit", "quantum-computing", "machine-learning", "education"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Education",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: Apache Software License",
