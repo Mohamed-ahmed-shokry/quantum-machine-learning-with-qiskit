@@ -93,8 +93,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     serialized = json.dumps(result.as_dict(), indent=2)
 
     if args.output is not None:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(f"{serialized}\n", encoding="utf-8")
+        try:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(f"{serialized}\n", encoding="utf-8")
+        except OSError as error:
+            parser.error(f"could not write --output {args.output}: {error}")
 
     print(serialized if args.as_json else _format_report(result))
     return 0
