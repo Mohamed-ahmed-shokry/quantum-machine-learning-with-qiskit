@@ -35,6 +35,9 @@ jobs:
       - name: Lint source, tests, and maintained notebooks
         run: python -m ruff check src tests notebooks
 
+      - name: Check source and notebook formatting
+        run: python -m ruff format --check src tests notebooks
+
       - name: Run test suite
         run: python -m pytest --cov --cov-report=term-missing
 
