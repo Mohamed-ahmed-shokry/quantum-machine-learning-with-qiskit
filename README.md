@@ -22,6 +22,7 @@ No IBM Quantum account, API token, or GPU is required for the core workflow.
 | `qml-qiskit` | Human-readable and JSON benchmark CLI |
 | `notebooks/01_quantum_circuits.ipynb` | Bell states and V2 `StatevectorSampler` |
 | `notebooks/02_quantum_kernel_benchmark.ipynb` | End-to-end quantum-kernel lab |
+| `notebooks/03_repeated_seed_study.ipynb` | Paired multi-seed experiment design |
 | `tests/` | Fast behavioral tests with a 95% coverage gate |
 | `.github/workflows/ci.yml` | CI on Python 3.10, 3.12, and 3.14 |
 
@@ -138,6 +139,8 @@ Follow the notebooks in order:
    and Qiskit's V2 sampler interface.
 2. `02_quantum_kernel_benchmark.ipynb` prepares data, builds a `ZZFeatureMap`,
    verifies the kernel matrix, and evaluates both classifiers.
+3. `03_repeated_seed_study.ipynb` measures split-to-split variation, audits
+   every paired run, and explains responsible interpretation.
 
 The notebooks contain assertions as well as explanations, so incorrect
 intermediate results fail visibly.
@@ -168,6 +171,7 @@ and positive semidefiniteness.
 ├── notebooks/
 │   ├── 01_quantum_circuits.ipynb
 │   ├── 02_quantum_kernel_benchmark.ipynb
+│   ├── 03_repeated_seed_study.ipynb
 │   └── legacy/
 ├── src/qml_qiskit/
 │   ├── cli.py
