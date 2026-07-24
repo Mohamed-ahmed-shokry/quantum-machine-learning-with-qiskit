@@ -81,6 +81,22 @@ def test_cli_prints_readable_study_report(capsys) -> None:
     assert "Mean quantum test-score delta:" in output
 
 
+def test_cli_reports_output_write_failures(tmp_path, capsys) -> None:
+    with pytest.raises(SystemExit, match="2"):
+        main(
+            [
+                "--samples",
+                "20",
+                "--feature-map-reps",
+                "1",
+                "--output",
+                str(tmp_path),
+            ]
+        )
+
+    assert "could not write --output" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(
     "arguments",
     [
