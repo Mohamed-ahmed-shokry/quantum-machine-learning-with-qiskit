@@ -34,6 +34,7 @@ constructors. Avoid reintroducing retired APIs preserved in
 ```bash
 python -m ruff check src tests notebooks
 python -m ruff format --check src tests notebooks
+python -m mypy src
 python -m pytest --cov --cov-report=term-missing
 python -m build
 python -m pip check
