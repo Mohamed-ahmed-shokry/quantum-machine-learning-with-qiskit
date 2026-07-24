@@ -18,6 +18,7 @@ No IBM Quantum account, API token, or GPU is required for the core workflow.
 | --- | --- |
 | `qml_qiskit.data` | Leakage-safe, seeded dataset generation and angle scaling |
 | `qml_qiskit.models` | Classical RBF SVC, fidelity-statevector kernel, and QSVC |
+| `qml_qiskit.study` | Repeated paired runs with aggregate statistics |
 | `qml-qiskit` | Human-readable and JSON benchmark CLI |
 | `notebooks/01_quantum_circuits.ipynb` | Bell states and V2 `StatevectorSampler` |
 | `notebooks/02_quantum_kernel_benchmark.ipynb` | End-to-end quantum-kernel lab |
@@ -84,6 +85,21 @@ qml-qiskit --samples 80 --noise 0.08 --test-size 0.3 \
   --seed 7 --feature-map-reps 3
 ```
 
+One split can be misleading. Run a paired study over consecutive seeds to
+report mean accuracy, population standard deviation, and win/tie counts:
+
+```bash
+qml-qiskit --repeats 10 --samples 60 --seed 42
+```
+
+Every repeated run is retained in JSON output, so aggregate claims remain
+auditable:
+
+```bash
+qml-qiskit --repeats 10 --json \
+  --output artifacts/ten-seed-study.json
+```
+
 Produce machine-readable output or save an experiment artifact:
 
 ```bash
@@ -94,13 +110,17 @@ qml-qiskit --output artifacts/benchmark.json
 The same workflow is available as a Python API:
 
 ```python
-from qml_qiskit import make_moons_split, run_benchmark
+from qml_qiskit import make_moons_split, run_benchmark, run_study
 
 data = make_moons_split(samples=60, seed=42)
 result = run_benchmark(data, seed=42, feature_map_reps=2)
 
 print(result.quantum.test_accuracy)
 print(result.as_dict())
+
+study = run_study(samples=60, base_seed=42, runs=10)
+print(study.quantum.test_accuracy_mean)
+print(study.quantum_wins, study.ties, study.classical_wins)
 ```
 
 ## Run the notebooks
@@ -133,6 +153,8 @@ intermediate results fail visibly.
 6. `FidelityStatevectorKernel` computes
    `K(x, y) = |<φ(x)|φ(y)>|²` exactly.
 7. QSVC learns its decision boundary from that precomputed quantum kernel.
+8. Study mode repeats the paired comparison over consecutive seeds and reports
+   the mean, population standard deviation, and every underlying run.
 
 The exact simulator keeps the example fast and reproducible. It also makes the
 kernel easy to inspect: the maintained notebook checks symmetry, unit diagonal,
@@ -150,7 +172,8 @@ and positive semidefiniteness.
 ├── src/qml_qiskit/
 │   ├── cli.py
 │   ├── data.py
-│   └── models.py
+│   ├── models.py
+│   └── study.py
 ├── tests/
 ├── pyproject.toml
 └── README.md
@@ -168,7 +191,7 @@ python -m pytest --cov --cov-report=term-missing
 
 The test suite covers data validation and reproducibility, circuit
 construction, quantum and classical model execution, result serialization,
-CLI behavior, and output persistence.
+repeated-study aggregation, CLI behavior, and output persistence.
 
 ## Real quantum hardware
 
