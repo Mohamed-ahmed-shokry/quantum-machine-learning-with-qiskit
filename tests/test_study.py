@@ -45,6 +45,15 @@ def test_run_study_rejects_single_run() -> None:
         run_study(runs=1)
 
 
+@pytest.mark.parametrize("base_seed", [-1, 2**32 - 1])
+def test_run_study_rejects_seed_ranges_that_cannot_fit_runs(base_seed: int) -> None:
+    with pytest.raises(
+        ValueError,
+        match="base_seed and runs must produce seeds between 0 and 4294967295",
+    ):
+        run_study(base_seed=base_seed, runs=2)
+
+
 def test_run_study_propagates_dataset_validation() -> None:
     with pytest.raises(ValueError, match="samples must be at least 8"):
         run_study(samples=7, runs=2)
