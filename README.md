@@ -1,3 +1,212 @@
 # Quantum Machine Learning with Qiskit
 
-This repository explores the intersection of quantum computing and machine learning using Qiskit. It focuses on building and understanding hybrid quantum-classical models for real-world ML tasks.
+[![CI](https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit/actions/workflows/ci.yml/badge.svg)](https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit/actions/workflows/ci.yml)
+[![Python 3.10–3.14](https://img.shields.io/badge/python-3.10%E2%80%933.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Qiskit 2.x](https://img.shields.io/badge/Qiskit-2.x-6929C4)](https://www.ibm.com/quantum/qiskit)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
+A reproducible, test-driven introduction to quantum machine learning with
+modern Qiskit primitives. The project builds a nonlinear classification
+benchmark, inspects its quantum fidelity kernel, and compares a Qiskit QSVC
+against a classical support vector machine on exactly the same data.
+
+No IBM Quantum account, API token, or GPU is required for the core workflow.
+
+## What is included
+
+| Component | Purpose |
+| --- | --- |
+| `qml_qiskit.data` | Leakage-safe, seeded dataset generation and angle scaling |
+| `qml_qiskit.models` | Classical RBF SVC, fidelity-statevector kernel, and QSVC |
+| `qml-qiskit` | Human-readable and JSON benchmark CLI |
+| `notebooks/01_quantum_circuits.ipynb` | Bell states and V2 `StatevectorSampler` |
+| `notebooks/02_quantum_kernel_benchmark.ipynb` | End-to-end quantum-kernel lab |
+| `tests/` | Fast behavioral tests with a 95% coverage gate |
+| `.github/workflows/ci.yml` | CI on Python 3.10, 3.12, and 3.14 |
+
+The original pre-1.0 experiments remain under `notebooks/legacy/` for
+historical context, but they are deliberately excluded from the maintained
+workflow.
+
+## Quick start
+
+Clone the repository and create an isolated environment:
+
+```bash
+git clone https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit.git
+cd quantum-machine-learning-with-qiskit
+python -m venv .venv
+```
+
+Activate it on macOS or Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Or on Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install the project and run the benchmark:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -e .
+qml-qiskit
+```
+
+A default run trains both models on a deterministic 60-sample moon dataset and
+prints comparable train accuracy, test accuracy, fit time, and support-vector
+count:
+
+```text
+QML benchmark | 60 samples | 2 features | seed 42
+-------------------------------------------------
+Model                        Train     Test    Fit (s)    SVs
+Classical RBF SVC            0.978    0.867      ...       18
+Quantum fidelity QSVC        0.800    0.867      ...       38
+-------------------------------------------------
+Quantum test-score delta: +0.000
+```
+
+Timings vary by machine. The seeded data and exact statevector kernel make the
+scores reproducible for a fixed dependency set.
+
+## Explore experiments
+
+Change the sample count, noise, split, seed, or circuit depth:
+
+```bash
+qml-qiskit --samples 80 --noise 0.08 --test-size 0.3 \
+  --seed 7 --feature-map-reps 3
+```
+
+Produce machine-readable output or save an experiment artifact:
+
+```bash
+qml-qiskit --json
+qml-qiskit --output artifacts/benchmark.json
+```
+
+The same workflow is available as a Python API:
+
+```python
+from qml_qiskit import make_moons_split, run_benchmark
+
+data = make_moons_split(samples=60, seed=42)
+result = run_benchmark(data, seed=42, feature_map_reps=2)
+
+print(result.quantum.test_accuracy)
+print(result.as_dict())
+```
+
+## Run the notebooks
+
+Install the notebook extras and launch JupyterLab:
+
+```bash
+python -m pip install -e ".[notebooks]"
+jupyter lab
+```
+
+Follow the notebooks in order:
+
+1. `01_quantum_circuits.ipynb` introduces circuits, entanglement, measurement,
+   and Qiskit's V2 sampler interface.
+2. `02_quantum_kernel_benchmark.ipynb` prepares data, builds a `ZZFeatureMap`,
+   verifies the kernel matrix, and evaluates both classifiers.
+
+The notebooks contain assertions as well as explanations, so incorrect
+intermediate results fail visibly.
+
+## How the benchmark works
+
+1. `make_moons` creates a balanced nonlinear binary problem.
+2. A stratified train/test split is produced from a fixed random seed.
+3. A `MinMaxScaler` is fitted only on the training partition. Values are mapped
+   to `[0, π]`, which is suitable for parameterized rotation angles.
+4. The classical baseline uses scikit-learn's radial-basis SVC.
+5. The quantum model encodes samples with an entangling `ZZFeatureMap`.
+6. `FidelityStatevectorKernel` computes
+   `K(x, y) = |<φ(x)|φ(y)>|²` exactly.
+7. QSVC learns its decision boundary from that precomputed quantum kernel.
+
+The exact simulator keeps the example fast and reproducible. It also makes the
+kernel easy to inspect: the maintained notebook checks symmetry, unit diagonal,
+and positive semidefiniteness.
+
+## Project structure
+
+```text
+.
+├── .github/workflows/ci.yml
+├── notebooks/
+│   ├── 01_quantum_circuits.ipynb
+│   ├── 02_quantum_kernel_benchmark.ipynb
+│   └── legacy/
+├── src/qml_qiskit/
+│   ├── cli.py
+│   ├── data.py
+│   └── models.py
+├── tests/
+├── pyproject.toml
+└── README.md
+```
+
+## Development
+
+Install the development dependencies, then run the same checks used by CI:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m ruff check src tests notebooks
+python -m pytest --cov --cov-report=term-missing
+```
+
+The test suite covers data validation and reproducibility, circuit
+construction, quantum and classical model execution, result serialization,
+CLI behavior, and output persistence.
+
+## Real quantum hardware
+
+The core benchmark intentionally uses local exact simulation. To experiment
+with IBM Quantum Runtime separately, install the optional dependency:
+
+```bash
+python -m pip install -e ".[runtime]"
+```
+
+Keep credentials outside source code and notebooks:
+
+```bash
+export QISKIT_IBM_TOKEN="your-token"
+```
+
+On PowerShell, use
+`$env:QISKIT_IBM_TOKEN = "your-token"` for the current process. Never commit a
+token. If a credential is committed even once, revoke it; deleting it from the
+latest revision does not erase Git history.
+
+## Scope and interpretation
+
+This repository is an educational benchmark, not a claim of quantum advantage.
+A classical simulator performs the quantum-state calculations, the dataset is
+small, and accuracy varies with the split and feature map. The useful result is
+the transparent experiment: both models share the same preprocessing and data,
+all configuration is explicit, and the comparison can be repeated or extended.
+
+For larger experiments, track wall-clock cost, circuit depth, sampling noise,
+and classical baselines in addition to accuracy.
+
+## References
+
+- [Qiskit SDK documentation](https://quantum.cloud.ibm.com/docs/api/qiskit)
+- [Qiskit Machine Learning documentation](https://qiskit-community.github.io/qiskit-machine-learning/)
+- [Qiskit Machine Learning tutorials](https://qiskit-community.github.io/qiskit-machine-learning/tutorials/)
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).
