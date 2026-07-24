@@ -79,11 +79,17 @@ def run_study(
         for seed in seeds
     )
     advantages = tuple(result.quantum_advantage for result in benchmarks)
-    quantum_wins = sum(advantage > 0 and not isclose(advantage, 0) for advantage in advantages)
-    classical_wins = sum(advantage < 0 and not isclose(advantage, 0) for advantage in advantages)
+    quantum_wins = sum(
+        advantage > 0 and not isclose(advantage, 0, abs_tol=1e-12)
+        for advantage in advantages
+    )
+    classical_wins = sum(
+        advantage < 0 and not isclose(advantage, 0, abs_tol=1e-12)
+        for advantage in advantages
+    )
     ties = runs - quantum_wins - classical_wins
     advantage_mean = fmean(advantages)
-    if isclose(advantage_mean, 0):
+    if isclose(advantage_mean, 0, abs_tol=1e-12):
         advantage_mean = 0.0
 
     return StudyResult(
