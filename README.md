@@ -203,6 +203,7 @@ Install the development dependencies, then run the same checks used by CI:
 ```bash
 python -m pip install -e ".[dev]"
 python -m ruff check src tests notebooks
+python -m ruff format --check src tests notebooks
 python -m pytest --cov --cov-report=term-missing
 ```
 
