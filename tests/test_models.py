@@ -21,9 +21,7 @@ def test_build_feature_map_has_expected_shape() -> None:
         (2, 0, "reps must be at least 1"),
     ],
 )
-def test_build_feature_map_rejects_invalid_values(
-    features: int, reps: int, message: str
-) -> None:
+def test_build_feature_map_rejects_invalid_values(features: int, reps: int, message: str) -> None:
     with pytest.raises(ValueError, match=message):
         build_feature_map(features, reps=reps)
 

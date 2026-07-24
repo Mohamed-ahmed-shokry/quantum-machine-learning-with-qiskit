@@ -76,9 +76,7 @@ def test_cli_prints_repeated_study_json(capsys) -> None:
 
 
 def test_cli_prints_readable_study_report(capsys) -> None:
-    exit_code = main(
-        ["--samples", "20", "--feature-map-reps", "1", "--repeats", "2"]
-    )
+    exit_code = main(["--samples", "20", "--feature-map-reps", "1", "--repeats", "2"])
     output = capsys.readouterr().out
 
     assert exit_code == 0
