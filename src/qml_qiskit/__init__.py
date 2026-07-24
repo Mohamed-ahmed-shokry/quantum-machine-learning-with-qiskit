@@ -11,6 +11,7 @@ from qml_qiskit.models import (
     build_quantum_classifier,
     run_benchmark,
 )
+from qml_qiskit.report import render_html_report
 from qml_qiskit.study import MetricSummary, StudyResult, run_study
 
 try:
@@ -29,6 +30,7 @@ __all__ = [
     "build_quantum_classifier",
     "load_artifact_schema",
     "make_moons_split",
+    "render_html_report",
     "run_benchmark",
     "run_study",
 ]
