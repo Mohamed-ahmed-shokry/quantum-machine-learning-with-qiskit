@@ -102,6 +102,30 @@ def test_cli_reports_output_write_failures(tmp_path, capsys) -> None:
     assert "could not write --output" in capsys.readouterr().err
 
 
+def test_cli_writes_html_study_report(tmp_path, capsys) -> None:
+    report_path = tmp_path / "reports" / "study.html"
+
+    exit_code = main(
+        [
+            "--samples",
+            "20",
+            "--feature-map-reps",
+            "1",
+            "--repeats",
+            "2",
+            "--report",
+            str(report_path),
+        ]
+    )
+    report = report_path.read_text(encoding="utf-8")
+
+    assert exit_code == 0
+    assert "QML study" in capsys.readouterr().out
+    assert report.startswith("<!doctype html>")
+    assert "Paired run audit" in report
+    assert "Responsible interpretation" in report
+
+
 @pytest.mark.parametrize(
     "arguments",
     [
