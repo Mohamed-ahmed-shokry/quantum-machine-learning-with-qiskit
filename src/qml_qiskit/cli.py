@@ -9,6 +9,7 @@ from pathlib import Path
 
 from qml_qiskit.data import make_moons_split
 from qml_qiskit.models import BenchmarkResult, run_benchmark
+from qml_qiskit.study import StudyResult, run_study
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -32,6 +33,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="fraction reserved for testing (default: 0.25)",
     )
     parser.add_argument("--seed", type=int, default=42, help="random seed (default: 42)")
+    parser.add_argument(
+        "--repeats",
+        type=int,
+        default=1,
+        help="number of consecutive-seed paired runs (default: 1)",
+    )
     parser.add_argument(
         "--feature-map-reps",
         type=int,
@@ -60,15 +67,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     _validate_args(parser, args)
 
     try:
-        data = make_moons_split(
-            samples=args.samples,
-            noise=args.noise,
-            test_size=args.test_size,
-            seed=args.seed,
-        )
+        if args.repeats == 1:
+            data = make_moons_split(
+                samples=args.samples,
+                noise=args.noise,
+                test_size=args.test_size,
+                seed=args.seed,
+            )
+            result = run_benchmark(
+                data,
+                seed=args.seed,
+                feature_map_reps=args.feature_map_reps,
+            )
+        else:
+            result = run_study(
+                samples=args.samples,
+                noise=args.noise,
+                test_size=args.test_size,
+                base_seed=args.seed,
+                runs=args.repeats,
+                feature_map_reps=args.feature_map_reps,
+            )
     except ValueError as error:
         parser.error(str(error))
-    result = run_benchmark(data, seed=args.seed, feature_map_reps=args.feature_map_reps)
     serialized = json.dumps(result.as_dict(), indent=2)
 
     if args.output is not None:
@@ -86,11 +107,19 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
         parser.error("--noise must be non-negative")
     if not 0 < args.test_size < 1:
         parser.error("--test-size must be between 0 and 1")
+    if args.repeats < 1:
+        parser.error("--repeats must be at least 1")
     if args.feature_map_reps < 1:
         parser.error("--feature-map-reps must be at least 1")
 
 
-def _format_report(result: BenchmarkResult) -> str:
+def _format_report(result: BenchmarkResult | StudyResult) -> str:
+    if isinstance(result, StudyResult):
+        return _format_study_report(result)
+    return _format_benchmark_report(result)
+
+
+def _format_benchmark_report(result: BenchmarkResult) -> str:
     header = (
         f"QML benchmark | {result.samples} samples | {result.features} features | "
         f"seed {result.seed}"
@@ -112,6 +141,41 @@ def _format_report(result: BenchmarkResult) -> str:
         f"{result.quantum.support_vectors:>6}",
         separator,
         f"Quantum test-score delta: {result.quantum_advantage:+.3f}",
+    ]
+    return "\n".join(rows)
+
+
+def _format_study_report(result: StudyResult) -> str:
+    header = (
+        f"QML study | {result.samples} samples | {len(result.seeds)} paired runs | "
+        f"seeds {result.seeds[0]}-{result.seeds[-1]}"
+    )
+    separator = "-" * len(header)
+    rows = [
+        header,
+        separator,
+        f"{'Model':<25} {'Train mean':>10} {'Test mean ± sd':>16} {'Fit mean':>10} {'SV mean':>9}",
+        f"{result.classical.name:<25} "
+        f"{result.classical.train_accuracy_mean:>10.3f} "
+        f"{result.classical.test_accuracy_mean:>8.3f} ± "
+        f"{result.classical.test_accuracy_std:<5.3f} "
+        f"{result.classical.fit_seconds_mean:>10.4f} "
+        f"{result.classical.support_vectors_mean:>9.1f}",
+        f"{result.quantum.name:<25} "
+        f"{result.quantum.train_accuracy_mean:>10.3f} "
+        f"{result.quantum.test_accuracy_mean:>8.3f} ± "
+        f"{result.quantum.test_accuracy_std:<5.3f} "
+        f"{result.quantum.fit_seconds_mean:>10.4f} "
+        f"{result.quantum.support_vectors_mean:>9.1f}",
+        separator,
+        (
+            "Paired outcomes (quantum / tie / classical): "
+            f"{result.quantum_wins} / {result.ties} / {result.classical_wins}"
+        ),
+        (
+            "Mean quantum test-score delta: "
+            f"{result.quantum_advantage_mean:+.3f} ± {result.quantum_advantage_std:.3f}"
+        ),
     ]
     return "\n".join(rows)
 
