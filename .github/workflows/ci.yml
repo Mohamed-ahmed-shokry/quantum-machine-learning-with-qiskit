@@ -38,6 +38,9 @@ jobs:
       - name: Check source and notebook formatting
         run: python -m ruff format --check src tests notebooks
 
+      - name: Type-check package
+        run: python -m mypy src
+
       - name: Run test suite
         run: python -m pytest --cov --cov-report=term-missing
 
