@@ -6,6 +6,7 @@ import json
 import platform
 from importlib import resources
 from importlib.metadata import PackageNotFoundError, version
+from typing import cast
 
 ARTIFACT_SCHEMA_VERSION = 1
 TRACKED_PACKAGES = (
@@ -31,7 +32,7 @@ def load_artifact_schema() -> dict[str, object]:
     """Load the JSON Schema matching :data:`ARTIFACT_SCHEMA_VERSION`."""
 
     schema_file = resources.files("qml_qiskit.schemas").joinpath("result-v1.schema.json")
-    return json.loads(schema_file.read_text(encoding="utf-8"))
+    return cast(dict[str, object], json.loads(schema_file.read_text(encoding="utf-8")))
 
 
 def _package_version(package: str) -> str:

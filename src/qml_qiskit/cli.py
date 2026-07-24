@@ -67,6 +67,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     _validate_args(parser, args)
+    result: BenchmarkResult | StudyResult
 
     try:
         if args.repeats == 1:
