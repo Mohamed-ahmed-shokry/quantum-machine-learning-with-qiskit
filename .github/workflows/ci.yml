@@ -41,6 +41,9 @@ jobs:
       - name: Type-check package
         run: python -m mypy src
 
+      - name: Audit installed dependencies
+        run: python -m pip_audit --skip-editable
+
       - name: Run test suite
         run: python -m pytest --cov --cov-report=term-missing
 
