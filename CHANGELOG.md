@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows
 - Repeated paired studies with mean, standard deviation, and win/tie counts.
 - Human-readable and JSON CLI with artifact output.
 - Schema-versioned artifacts with Python, platform, and dependency metadata.
+- Packaged JSON Schema and a public loader for artifact contract validation.
 - Three maintained, executable educational notebooks.
 - Behavioral test suite with notebook execution and a 95% coverage gate.
 - Python 3.10, 3.12, and 3.14 GitHub Actions matrix.

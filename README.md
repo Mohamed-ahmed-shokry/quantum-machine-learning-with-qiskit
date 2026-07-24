@@ -95,7 +95,9 @@ qml-qiskit --repeats 10 --samples 60 --seed 42
 
 Every repeated run is retained in JSON output, so aggregate claims remain
 auditable. Serialized results also include an artifact schema version, Python
-version, platform, and core dependency versions:
+version, platform, and core dependency versions. The packaged
+[JSON Schema](src/qml_qiskit/schemas/result-v1.schema.json) validates both
+single benchmarks and repeated studies:
 
 ```bash
 qml-qiskit --repeats 10 --json \
@@ -112,7 +114,12 @@ qml-qiskit --output artifacts/benchmark.json
 The same workflow is available as a Python API:
 
 ```python
-from qml_qiskit import make_moons_split, run_benchmark, run_study
+from qml_qiskit import (
+    load_artifact_schema,
+    make_moons_split,
+    run_benchmark,
+    run_study,
+)
 
 data = make_moons_split(samples=60, seed=42)
 result = run_benchmark(data, seed=42, feature_map_reps=2)
@@ -123,6 +130,8 @@ print(result.as_dict())
 study = run_study(samples=60, base_seed=42, runs=10)
 print(study.quantum.test_accuracy_mean)
 print(study.quantum_wins, study.ties, study.classical_wins)
+
+schema = load_artifact_schema()
 ```
 
 ## Run the notebooks
@@ -179,6 +188,7 @@ and positive semidefiniteness.
 │   ├── data.py
 │   ├── metadata.py
 │   ├── models.py
+│   ├── schemas/
 │   └── study.py
 ├── tests/
 ├── pyproject.toml
