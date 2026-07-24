@@ -210,6 +210,7 @@ python -m pip install -e ".[dev]"
 python -m ruff check src tests notebooks
 python -m ruff format --check src tests notebooks
 python -m mypy src
+python -m pip_audit --skip-editable
 python -m pytest --cov --cov-report=term-missing
 ```
 
