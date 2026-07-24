@@ -3,6 +3,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from qml_qiskit.data import DatasetSplit, make_moons_split
+from qml_qiskit.metadata import load_artifact_schema
 from qml_qiskit.models import (
     BenchmarkResult,
     ModelMetrics,
@@ -26,6 +27,7 @@ __all__ = [
     "__version__",
     "build_feature_map",
     "build_quantum_classifier",
+    "load_artifact_schema",
     "make_moons_split",
     "run_benchmark",
     "run_study",

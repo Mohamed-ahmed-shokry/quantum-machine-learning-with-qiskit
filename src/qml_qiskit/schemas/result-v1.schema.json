@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit/raw/main/schemas/result-v1.schema.json",
+  "$id": "https://github.com/Mohamed-ahmed-shokry/quantum-machine-learning-with-qiskit/raw/main/src/qml_qiskit/schemas/result-v1.schema.json",
   "title": "QML Qiskit experiment artifact",
   "description": "A single benchmark or repeated paired-study result.",
   "oneOf": [
