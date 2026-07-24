@@ -94,7 +94,8 @@ qml-qiskit --repeats 10 --samples 60 --seed 42
 ```
 
 Every repeated run is retained in JSON output, so aggregate claims remain
-auditable:
+auditable. Serialized results also include an artifact schema version, Python
+version, platform, and core dependency versions:
 
 ```bash
 qml-qiskit --repeats 10 --json \
@@ -176,6 +177,7 @@ and positive semidefiniteness.
 ├── src/qml_qiskit/
 │   ├── cli.py
 │   ├── data.py
+│   ├── metadata.py
 │   ├── models.py
 │   └── study.py
 ├── tests/
