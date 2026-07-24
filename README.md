@@ -230,6 +230,12 @@ all configuration is explicit, and the comparison can be repeated or extended.
 For larger experiments, track wall-clock cost, circuit depth, sampling noise,
 and classical baselines in addition to accuracy.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup, quality gates,
+commit expectations, and pull-request guidance. Report vulnerabilities
+privately using [SECURITY.md](SECURITY.md).
+
 ## References
 
 - [Qiskit SDK documentation](https://quantum.cloud.ibm.com/docs/api/qiskit)
