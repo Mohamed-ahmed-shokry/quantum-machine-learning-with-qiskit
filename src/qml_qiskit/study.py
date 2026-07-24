@@ -8,6 +8,7 @@ from statistics import fmean, pstdev
 from typing import Any
 
 from qml_qiskit.data import MAX_RANDOM_SEED, make_moons_split
+from qml_qiskit.metadata import ARTIFACT_SCHEMA_VERSION, runtime_metadata
 from qml_qiskit.models import BenchmarkResult, ModelMetrics, run_benchmark
 
 
@@ -47,7 +48,10 @@ class StudyResult:
     def as_dict(self) -> dict[str, Any]:
         """Return the complete study as a JSON-serializable mapping."""
 
-        return asdict(self)
+        payload = asdict(self)
+        payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
+        payload["runtime"] = runtime_metadata()
+        return payload
 
 
 def run_study(

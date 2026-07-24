@@ -13,6 +13,7 @@ from qiskit_machine_learning.kernels import FidelityStatevectorKernel
 from sklearn.svm import SVC
 
 from qml_qiskit.data import DatasetSplit
+from qml_qiskit.metadata import ARTIFACT_SCHEMA_VERSION, runtime_metadata
 
 
 class _Classifier(Protocol):
@@ -54,6 +55,8 @@ class BenchmarkResult:
 
         payload = asdict(self)
         payload["quantum_advantage"] = self.quantum_advantage
+        payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
+        payload["runtime"] = runtime_metadata()
         return payload
 
 
