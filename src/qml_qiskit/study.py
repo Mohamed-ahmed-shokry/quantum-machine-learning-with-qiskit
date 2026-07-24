@@ -82,6 +82,9 @@ def run_study(
     quantum_wins = sum(advantage > 0 and not isclose(advantage, 0) for advantage in advantages)
     classical_wins = sum(advantage < 0 and not isclose(advantage, 0) for advantage in advantages)
     ties = runs - quantum_wins - classical_wins
+    advantage_mean = fmean(advantages)
+    if isclose(advantage_mean, 0):
+        advantage_mean = 0.0
 
     return StudyResult(
         samples=samples,
@@ -90,7 +93,7 @@ def run_study(
         feature_map_reps=feature_map_reps,
         classical=_summarize(tuple(result.classical for result in benchmarks)),
         quantum=_summarize(tuple(result.quantum for result in benchmarks)),
-        quantum_advantage_mean=fmean(advantages),
+        quantum_advantage_mean=advantage_mean,
         quantum_advantage_std=pstdev(advantages),
         quantum_wins=quantum_wins,
         ties=ties,
