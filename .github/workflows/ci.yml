@@ -37,3 +37,6 @@ jobs:
 
       - name: Run test suite
         run: python -m pytest --cov --cov-report=term-missing
+
+      - name: Build source and wheel distributions
+        run: python -m build
