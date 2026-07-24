@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import ceil
 
 import numpy as np
 from numpy.typing import NDArray
@@ -50,6 +51,9 @@ def make_moons_split(
         raise ValueError("noise must be non-negative")
     if not 0 < test_size < 1:
         raise ValueError("test_size must be between 0 and 1")
+    test_samples = ceil(samples * test_size)
+    if test_samples < 2 or samples - test_samples < 2:
+        raise ValueError("test_size must leave at least two samples in each split")
 
     features, labels = make_moons(n_samples=samples, noise=noise, random_state=seed)
     train_features, test_features, train_labels, test_labels = train_test_split(

@@ -59,12 +59,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     _validate_args(parser, args)
 
-    data = make_moons_split(
-        samples=args.samples,
-        noise=args.noise,
-        test_size=args.test_size,
-        seed=args.seed,
-    )
+    try:
+        data = make_moons_split(
+            samples=args.samples,
+            noise=args.noise,
+            test_size=args.test_size,
+            seed=args.seed,
+        )
+    except ValueError as error:
+        parser.error(str(error))
     result = run_benchmark(data, seed=args.seed, feature_map_reps=args.feature_map_reps)
     serialized = json.dumps(result.as_dict(), indent=2)
 

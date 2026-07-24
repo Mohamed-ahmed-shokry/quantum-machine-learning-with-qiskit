@@ -33,6 +33,10 @@ def test_make_moons_split_is_reproducible_and_scaled() -> None:
         ({"noise": -0.01}, "noise must be non-negative"),
         ({"test_size": 0}, "test_size must be between 0 and 1"),
         ({"test_size": 1}, "test_size must be between 0 and 1"),
+        (
+            {"samples": 8, "test_size": 0.1},
+            "test_size must leave at least two samples in each split",
+        ),
     ],
 )
 def test_make_moons_split_rejects_invalid_values(

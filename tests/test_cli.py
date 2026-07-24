@@ -51,6 +51,7 @@ def test_cli_prints_readable_report(capsys) -> None:
         ["--samples", "7"],
         ["--noise", "-1"],
         ["--test-size", "1"],
+        ["--samples", "8", "--test-size", "0.1"],
         ["--feature-map-reps", "0"],
     ],
 )
