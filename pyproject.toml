@@ -74,6 +74,7 @@ show_missing = true
 skip_covered = true
 
 [tool.ruff]
+extend-exclude = ["notebooks/legacy"]
 line-length = 100
 target-version = "py310"
 
