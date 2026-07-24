@@ -19,7 +19,7 @@ No IBM Quantum account, API token, or GPU is required for the core workflow.
 | `qml_qiskit.data` | Leakage-safe, seeded dataset generation and angle scaling |
 | `qml_qiskit.models` | Classical RBF SVC, fidelity-statevector kernel, and QSVC |
 | `qml_qiskit.study` | Repeated paired runs with aggregate statistics |
-| `qml-qiskit` | Human-readable and JSON benchmark CLI |
+| `qml-qiskit` | Console, JSON, and self-contained HTML reporting |
 | `notebooks/01_quantum_circuits.ipynb` | Bell states and V2 `StatevectorSampler` |
 | `notebooks/02_quantum_kernel_benchmark.ipynb` | End-to-end quantum-kernel lab |
 | `notebooks/03_repeated_seed_study.ipynb` | Paired multi-seed experiment design |
@@ -103,6 +103,8 @@ single benchmarks and repeated studies:
 ```bash
 qml-qiskit --repeats 10 --json \
   --output artifacts/ten-seed-study.json
+qml-qiskit --repeats 10 \
+  --report artifacts/ten-seed-study.html
 ```
 
 Produce machine-readable output or save an experiment artifact:
@@ -118,6 +120,7 @@ The same workflow is available as a Python API:
 from qml_qiskit import (
     load_artifact_schema,
     make_moons_split,
+    render_html_report,
     run_benchmark,
     run_study,
 )
@@ -133,6 +136,7 @@ print(study.quantum.test_accuracy_mean)
 print(study.quantum_wins, study.ties, study.classical_wins)
 
 schema = load_artifact_schema()
+html = render_html_report(study)
 ```
 
 ## Run the notebooks
@@ -189,6 +193,7 @@ and positive semidefiniteness.
 │   ├── data.py
 │   ├── metadata.py
 │   ├── models.py
+│   ├── report.py
 │   ├── schemas/
 │   └── study.py
 ├── tests/
@@ -211,6 +216,7 @@ python -m pytest --cov --cov-report=term-missing
 The test suite covers data validation and reproducibility, circuit
 construction, quantum and classical model execution, result serialization,
 repeated-study aggregation, CLI behavior, and output persistence.
+HTML reports are dependency-free, responsive, and tested for safe escaping.
 
 ## Real quantum hardware
 
