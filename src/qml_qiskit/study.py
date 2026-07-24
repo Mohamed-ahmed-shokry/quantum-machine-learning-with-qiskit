@@ -49,6 +49,13 @@ class StudyResult:
         """Return the complete study as a JSON-serializable mapping."""
 
         payload = asdict(self)
+        payload["benchmarks"] = [
+            {
+                **asdict(benchmark),
+                "quantum_advantage": benchmark.quantum_advantage,
+            }
+            for benchmark in self.benchmarks
+        ]
         payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
         payload["runtime"] = runtime_metadata()
         return payload
