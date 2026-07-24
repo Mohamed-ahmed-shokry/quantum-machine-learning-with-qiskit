@@ -49,6 +49,7 @@ class StudyResult:
         """Return the complete study as a JSON-serializable mapping."""
 
         payload = asdict(self)
+        payload["seeds"] = list(self.seeds)
         payload["benchmarks"] = [
             {
                 **asdict(benchmark),
