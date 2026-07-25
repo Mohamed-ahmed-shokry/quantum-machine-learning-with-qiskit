@@ -256,12 +256,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup, quality gates,
 commit expectations, and pull-request guidance. Report vulnerabilities
 privately using [SECURITY.md](SECURITY.md).
 
-## References
-
-- [Qiskit SDK documentation](https://quantum.cloud.ibm.com/docs/api/qiskit)
-- [Qiskit Machine Learning documentation](https://qiskit-community.github.io/qiskit-machine-learning/)
-- [Qiskit Machine Learning tutorials](https://qiskit-community.github.io/qiskit-machine-learning/tutorials/)
-
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE).
