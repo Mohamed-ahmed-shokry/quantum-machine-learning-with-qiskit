@@ -211,6 +211,36 @@ def test_cli_writes_matching_json_and_html_study_artifacts(tmp_path, capsys) -> 
     assert "Responsible interpretation" in report
     assert artifact["artifact_id"] in report
 
+    artifact["runtime"]["python"] = "saved-python"
+    output_path.write_text(json.dumps(artifact), encoding="utf-8")
+    regenerated_path = tmp_path / "reports" / "regenerated.html"
+
+    assert (
+        main(
+            [
+                "--from-artifact",
+                str(output_path),
+                "--report",
+                str(regenerated_path),
+            ]
+        )
+        == 0
+    )
+    regenerated = regenerated_path.read_text(encoding="utf-8")
+    assert artifact["artifact_id"] in regenerated
+    assert "Python saved-python" in regenerated
+    assert "rendered artifact" in capsys.readouterr().out
+
+
+def test_cli_reports_loaded_artifact_failures(tmp_path, capsys) -> None:
+    missing = tmp_path / "missing.json"
+    report = tmp_path / "report.html"
+
+    with pytest.raises(SystemExit, match="2"):
+        main(["--from-artifact", str(missing), "--report", str(report)])
+
+    assert "could not read artifact" in capsys.readouterr().err
+
 
 @pytest.mark.parametrize(
     "arguments",
@@ -226,6 +256,16 @@ def test_cli_writes_matching_json_and_html_study_artifacts(tmp_path, capsys) -> 
         ["--repeats", "0"],
         ["--feature-map-reps", "0"],
         ["--verify-artifact", "missing.json", "--samples", "20"],
+        ["--from-artifact", "artifact.json"],
+        ["--from-artifact", "artifact.json", "--report", "artifact.json"],
+        [
+            "--from-artifact",
+            "artifact.json",
+            "--report",
+            "report.html",
+            "--samples",
+            "20",
+        ],
     ],
 )
 def test_cli_rejects_invalid_arguments(arguments, capsys) -> None:

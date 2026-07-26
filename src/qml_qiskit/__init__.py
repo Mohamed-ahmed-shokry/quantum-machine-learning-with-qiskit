@@ -2,6 +2,7 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
+from qml_qiskit.artifacts import ArtifactLoadError, LoadedArtifact, load_artifact
 from qml_qiskit.data import DatasetSplit, make_moons_split
 from qml_qiskit.metadata import load_artifact_schema, verify_artifact_identifier
 from qml_qiskit.models import (
@@ -20,14 +21,17 @@ except PackageNotFoundError:
     __version__ = "0.0.0"
 
 __all__ = [
+    "ArtifactLoadError",
     "BenchmarkResult",
     "DatasetSplit",
+    "LoadedArtifact",
     "MetricSummary",
     "ModelMetrics",
     "StudyResult",
     "__version__",
     "build_feature_map",
     "build_quantum_classifier",
+    "load_artifact",
     "load_artifact_schema",
     "make_moons_split",
     "render_html_report",

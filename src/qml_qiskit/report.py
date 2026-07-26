@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from html import escape
 from typing import cast
 
@@ -10,12 +11,18 @@ from qml_qiskit.models import BenchmarkResult, ModelMetrics
 from qml_qiskit.study import StudyResult
 
 
-def render_html_report(result: BenchmarkResult | StudyResult) -> str:
-    """Render a self-contained, accessible HTML experiment report."""
+def render_html_report(
+    result: BenchmarkResult | StudyResult,
+    *,
+    runtime: Mapping[str, object] | None = None,
+    artifact_id: str | None = None,
+) -> str:
+    """Render a self-contained report with optional saved provenance."""
 
-    runtime = runtime_metadata()
+    runtime_info = runtime_metadata() if runtime is None else runtime
+    report_artifact_id = result.artifact_id if artifact_id is None else artifact_id
     body = _render_study(result) if isinstance(result, StudyResult) else _render_benchmark(result)
-    packages = cast(dict[str, str], runtime["packages"])
+    packages = cast(Mapping[str, str], runtime_info["packages"])
     package_list = " · ".join(
         f"{escape(name)} {escape(version)}" for name, version in packages.items()
     )
@@ -101,7 +108,7 @@ def render_html_report(result: BenchmarkResult | StudyResult) -> str:
     <div class="eyebrow">Quantum machine learning · Qiskit</div>
     <h1>Experiment report</h1>
     <p>Paired classical and quantum-kernel classification on a reproducible nonlinear dataset.</p>
-    <p class="artifact">Artifact ID <code>{escape(result.artifact_id)}</code></p>
+    <p class="artifact">Artifact ID <code>{escape(report_artifact_id)}</code></p>
   </header>
   {body}
   <section class="card note">
@@ -112,8 +119,8 @@ def render_html_report(result: BenchmarkResult | StudyResult) -> str:
     </p>
   </section>
   <footer>
-    qml-qiskit {escape(packages["qml-qiskit"])} · Python {escape(str(runtime["python"]))} ·
-    {escape(str(runtime["platform"]))}<br>
+    qml-qiskit {escape(packages["qml-qiskit"])} · Python {escape(str(runtime_info["python"]))} ·
+    {escape(str(runtime_info["platform"]))}<br>
     {package_list}
   </footer>
 </main>

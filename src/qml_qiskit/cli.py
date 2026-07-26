@@ -14,6 +14,7 @@ from tempfile import NamedTemporaryFile
 from typing import cast
 
 from qml_qiskit import __version__
+from qml_qiskit.artifacts import ArtifactLoadError, load_artifact
 from qml_qiskit.data import make_moons_split
 from qml_qiskit.metadata import verify_artifact_identifier
 from qml_qiskit.models import BenchmarkResult, run_benchmark
@@ -77,6 +78,12 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PATH",
         help="verify a saved artifact ID without running a benchmark",
     )
+    parser.add_argument(
+        "--from-artifact",
+        type=Path,
+        metavar="PATH",
+        help="load a saved artifact instead of running a benchmark",
+    )
     return parser
 
 
@@ -88,6 +95,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     _validate_args(parser, args)
     if args.verify_artifact is not None:
         return _verify_artifact(parser, args.verify_artifact)
+    if args.from_artifact is not None:
+        return _render_loaded_artifact(parser, args.from_artifact, args.report)
     result: BenchmarkResult | StudyResult
 
     try:
@@ -127,20 +136,22 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
     if args.verify_artifact is not None:
-        if any(
-            (
-                args.samples != 60,
-                args.noise != 0.12,
-                args.test_size != 0.25,
-                args.seed != 42,
-                args.repeats != 1,
-                args.feature_map_reps != 2,
-                args.as_json,
-                args.output is not None,
-                args.report is not None,
-            )
+        if (
+            _benchmark_options_selected(args)
+            or args.as_json
+            or args.output is not None
+            or args.report is not None
+            or args.from_artifact is not None
         ):
             parser.error("--verify-artifact cannot be combined with benchmark or output options")
+        return
+    if args.from_artifact is not None:
+        if _benchmark_options_selected(args) or args.as_json or args.output is not None:
+            parser.error("--from-artifact cannot be combined with benchmark or JSON options")
+        if args.report is None:
+            parser.error("--from-artifact requires --report")
+        if args.from_artifact.resolve() == args.report.resolve():
+            parser.error("--from-artifact and --report must use different paths")
         return
 
     if args.samples < 8:
@@ -159,6 +170,19 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
         and args.output.resolve() == args.report.resolve()
     ):
         parser.error("--output and --report must use different paths")
+
+
+def _benchmark_options_selected(args: argparse.Namespace) -> bool:
+    return any(
+        (
+            args.samples != 60,
+            args.noise != 0.12,
+            args.test_size != 0.25,
+            args.seed != 42,
+            args.repeats != 1,
+            args.feature_map_reps != 2,
+        )
+    )
 
 
 def _verify_artifact(parser: argparse.ArgumentParser, path: Path) -> int:
@@ -183,6 +207,20 @@ def _verify_artifact(parser: argparse.ArgumentParser, path: Path) -> int:
         return 1
 
     print(f"{path}: verified artifact {claimed_identifier}")
+    return 0
+
+
+def _render_loaded_artifact(
+    parser: argparse.ArgumentParser,
+    artifact_path: Path,
+    report_path: Path,
+) -> int:
+    try:
+        artifact = load_artifact(artifact_path)
+    except ArtifactLoadError as error:
+        parser.error(str(error))
+    _write_artifact(parser, report_path, artifact.render_html(), "--report")
+    print(f"{report_path}: rendered artifact {artifact.artifact_id}")
     return 0
 
 

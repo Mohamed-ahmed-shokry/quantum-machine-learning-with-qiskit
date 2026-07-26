@@ -16,6 +16,7 @@ No IBM Quantum account, API token, or GPU is required for the core workflow.
 
 | Component | Purpose |
 | --- | --- |
+| `qml_qiskit.artifacts` | Validated artifact loading and report regeneration |
 | `qml_qiskit.data` | Leakage-safe, seeded dataset generation and angle scaling |
 | `qml_qiskit.models` | Classical RBF SVC, fidelity-statevector kernel, and QSVC |
 | `qml_qiskit.study` | Repeated paired runs with aggregate statistics |
@@ -127,6 +128,17 @@ the measured content, and status 2 when the file cannot be read or parsed.
 The ID detects accidental content changes; it is not a signature or proof of
 who produced the artifact.
 
+Regenerate an HTML report later without rerunning the experiment:
+
+```bash
+qml-qiskit --from-artifact artifacts/ten-seed-study.json \
+  --report artifacts/ten-seed-study.html
+```
+
+Loading validates the packaged JSON Schema and artifact ID before
+reconstructing the result. The regenerated report retains the saved runtime
+provenance rather than describing the machine that renders it.
+
 Produce machine-readable output or save an experiment artifact:
 
 ```bash
@@ -139,6 +151,7 @@ The same workflow is available as a Python API:
 ```python
 from qml_qiskit import (
     load_artifact_schema,
+    load_artifact,
     make_moons_split,
     render_html_report,
     run_benchmark,
@@ -159,6 +172,9 @@ print(study.quantum_wins, study.ties, study.classical_wins)
 
 schema = load_artifact_schema()
 html = render_html_report(study)
+
+loaded = load_artifact("artifacts/ten-seed-study.json")
+saved_html = loaded.render_html()
 ```
 
 `run_benchmark` validates custom `DatasetSplit` instances before model
@@ -215,6 +231,7 @@ and positive semidefiniteness.
 │   ├── 03_repeated_seed_study.ipynb
 │   └── legacy/
 ├── src/qml_qiskit/
+│   ├── artifacts.py
 │   ├── cli.py
 │   ├── data.py
 │   ├── metadata.py
