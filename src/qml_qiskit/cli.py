@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from collections.abc import Sequence
+from contextlib import suppress
 from math import isfinite
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from qml_qiskit import __version__
 from qml_qiskit.data import make_moons_split
@@ -122,6 +125,12 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
         parser.error("--repeats must be at least 1")
     if args.feature_map_reps < 1:
         parser.error("--feature-map-reps must be at least 1")
+    if (
+        args.output is not None
+        and args.report is not None
+        and args.output.resolve() == args.report.resolve()
+    ):
+        parser.error("--output and --report must use different paths")
 
 
 def _format_report(result: BenchmarkResult | StudyResult) -> str:
@@ -205,10 +214,26 @@ def _write_artifact(
     content: str,
     option: str,
 ) -> None:
+    temporary_path: Path | None = None
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
+        with NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as temporary:
+            temporary_path = Path(temporary.name)
+            temporary.write(content)
+            temporary.flush()
+            os.fsync(temporary.fileno())
+        temporary_path.replace(path)
     except OSError as error:
+        if temporary_path is not None:
+            with suppress(OSError):
+                temporary_path.unlink(missing_ok=True)
         parser.error(f"could not write {option} {path}: {error}")
 
 

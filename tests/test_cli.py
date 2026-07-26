@@ -104,6 +104,16 @@ def test_cli_reports_output_write_failures(tmp_path, capsys) -> None:
         )
 
     assert "could not write --output" in capsys.readouterr().err
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_cli_rejects_conflicting_artifact_paths(tmp_path, capsys) -> None:
+    artifact = tmp_path / "result"
+
+    with pytest.raises(SystemExit, match="2"):
+        main(["--output", str(artifact), "--report", str(artifact)])
+
+    assert "--output and --report must use different paths" in capsys.readouterr().err
 
 
 def test_cli_writes_html_study_report(tmp_path, capsys) -> None:

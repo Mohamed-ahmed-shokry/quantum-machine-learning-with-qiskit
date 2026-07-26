@@ -17,6 +17,8 @@ All notable changes to this project are documented here. The format follows
   errors.
 - Benchmark runs now reject a model seed that conflicts with a generated
   dataset's recorded seed.
+- JSON and HTML outputs are written atomically, and the CLI rejects conflicting
+  output paths instead of silently overwriting one artifact with the other.
 
 ## 1.0.0 - 2026-07-24
 
