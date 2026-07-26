@@ -37,6 +37,8 @@ def test_cli_prints_json_and_writes_result(tmp_path, capsys) -> None:
     assert printed == saved
     assert printed["samples"] == 20
     assert printed["seed"] == 9
+    assert printed["noise"] == 0.12
+    assert printed["test_size"] == 0.25
     assert printed["classical"]["name"] == "Classical RBF SVC"
     assert printed["quantum"]["name"] == "Quantum fidelity QSVC"
 
@@ -47,6 +49,7 @@ def test_cli_prints_readable_report(capsys) -> None:
 
     assert exit_code == 0
     assert "QML benchmark | 20 samples" in output
+    assert "Dataset configuration: noise 0.12 | test split 0.25" in output
     assert "Classical RBF SVC" in output
     assert "Quantum fidelity QSVC" in output
     assert "Quantum test-score delta:" in output
@@ -81,6 +84,7 @@ def test_cli_prints_readable_study_report(capsys) -> None:
 
     assert exit_code == 0
     assert "QML study | 20 samples | 2 paired runs" in output
+    assert "Dataset configuration: noise 0.12 | test split 0.25" in output
     assert "Test mean ± sd" in output
     assert "Paired outcomes (quantum / tie / classical):" in output
     assert "Mean quantum test-score delta:" in output
@@ -131,7 +135,10 @@ def test_cli_writes_html_study_report(tmp_path, capsys) -> None:
     [
         ["--samples", "7"],
         ["--noise", "-1"],
+        ["--noise", "nan"],
+        ["--noise", "inf"],
         ["--test-size", "1"],
+        ["--test-size", "nan"],
         ["--seed", "-1"],
         ["--samples", "8", "--test-size", "0.1"],
         ["--repeats", "0"],

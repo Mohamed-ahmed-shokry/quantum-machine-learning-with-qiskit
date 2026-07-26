@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import ceil
+from math import ceil, isfinite
 
 import numpy as np
 from numpy.typing import NDArray
@@ -24,6 +24,9 @@ class DatasetSplit:
     test_features: FeatureArray
     train_labels: LabelArray
     test_labels: LabelArray
+    noise: float | None = None
+    test_size: float | None = None
+    seed: int | None = None
 
     @property
     def num_features(self) -> int:
@@ -48,9 +51,9 @@ def make_moons_split(
 
     if samples < 8:
         raise ValueError("samples must be at least 8")
-    if noise < 0:
-        raise ValueError("noise must be non-negative")
-    if not 0 < test_size < 1:
+    if not isfinite(noise) or noise < 0:
+        raise ValueError("noise must be a finite non-negative number")
+    if not isfinite(test_size) or not 0 < test_size < 1:
         raise ValueError("test_size must be between 0 and 1")
     if not 0 <= seed <= MAX_RANDOM_SEED:
         raise ValueError(f"seed must be between 0 and {MAX_RANDOM_SEED}")
@@ -76,4 +79,7 @@ def make_moons_split(
         test_features=np.asarray(scaled_test, dtype=np.float64),
         train_labels=np.asarray(train_labels, dtype=np.int_),
         test_labels=np.asarray(test_labels, dtype=np.int_),
+        noise=noise,
+        test_size=test_size,
+        seed=seed,
     )

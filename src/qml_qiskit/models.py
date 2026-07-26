@@ -43,6 +43,8 @@ class BenchmarkResult:
     feature_map_reps: int
     classical: ModelMetrics
     quantum: ModelMetrics
+    noise: float | None = None
+    test_size: float | None = None
 
     @property
     def quantum_advantage(self) -> float:
@@ -81,10 +83,15 @@ def build_quantum_classifier(num_features: int, *, reps: int = 2) -> QSVC:
 def run_benchmark(
     data: DatasetSplit,
     *,
-    seed: int = 42,
+    seed: int | None = None,
     feature_map_reps: int = 2,
 ) -> BenchmarkResult:
     """Fit a classical RBF SVC and an exact quantum-kernel SVC on one split."""
+
+    if seed is None:
+        seed = data.seed if data.seed is not None else 42
+    if data.seed is not None and seed != data.seed:
+        raise ValueError(f"seed must match the dataset seed ({data.seed})")
 
     classical_model = SVC(kernel="rbf", random_state=seed)
     quantum_model = build_quantum_classifier(data.num_features, reps=feature_map_reps)
@@ -99,6 +106,8 @@ def run_benchmark(
         feature_map_reps=feature_map_reps,
         classical=classical_metrics,
         quantum=quantum_metrics,
+        noise=data.noise,
+        test_size=data.test_size,
     )
 
 

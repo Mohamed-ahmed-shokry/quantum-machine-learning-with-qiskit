@@ -40,3 +40,21 @@ def test_schema_rejects_out_of_range_accuracy(validator: Draft202012Validator) -
 
     with pytest.raises(ValidationError):
         validator.validate(artifact)
+
+
+def test_schema_remains_compatible_with_existing_v1_artifacts(
+    validator: Draft202012Validator,
+) -> None:
+    artifact = run_study(
+        samples=20,
+        base_seed=3,
+        runs=2,
+        feature_map_reps=1,
+    ).as_dict()
+    artifact.pop("noise")
+    artifact.pop("test_size")
+    for benchmark in artifact["benchmarks"]:
+        benchmark.pop("noise")
+        benchmark.pop("test_size")
+
+    validator.validate(artifact)

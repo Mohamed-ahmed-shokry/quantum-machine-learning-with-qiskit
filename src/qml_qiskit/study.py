@@ -44,6 +44,8 @@ class StudyResult:
     ties: int
     classical_wins: int
     benchmarks: tuple[BenchmarkResult, ...]
+    noise: float | None = None
+    test_size: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         """Return the complete study as a JSON-serializable mapping."""
@@ -107,6 +109,8 @@ def run_study(
     return StudyResult(
         samples=samples,
         features=benchmarks[0].features,
+        noise=noise,
+        test_size=test_size,
         seeds=seeds,
         feature_map_reps=feature_map_reps,
         classical=_summarize(tuple(result.classical for result in benchmarks)),

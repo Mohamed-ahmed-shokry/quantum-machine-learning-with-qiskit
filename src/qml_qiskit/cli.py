@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Sequence
+from math import isfinite
 from pathlib import Path
 
 from qml_qiskit import __version__
@@ -113,9 +114,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
     if args.samples < 8:
         parser.error("--samples must be at least 8")
-    if args.noise < 0:
-        parser.error("--noise must be non-negative")
-    if not 0 < args.test_size < 1:
+    if not isfinite(args.noise) or args.noise < 0:
+        parser.error("--noise must be a finite non-negative number")
+    if not isfinite(args.test_size) or not 0 < args.test_size < 1:
         parser.error("--test-size must be between 0 and 1")
     if args.repeats < 1:
         parser.error("--repeats must be at least 1")
@@ -137,6 +138,7 @@ def _format_benchmark_report(result: BenchmarkResult) -> str:
     separator = "-" * len(header)
     rows = [
         header,
+        _format_dataset_config(result.noise, result.test_size),
         separator,
         f"{'Model':<25} {'Train':>8} {'Test':>8} {'Fit (s)':>10} {'SVs':>6}",
         f"{result.classical.name:<25} "
@@ -163,6 +165,7 @@ def _format_study_report(result: StudyResult) -> str:
     separator = "-" * len(header)
     rows = [
         header,
+        _format_dataset_config(result.noise, result.test_size),
         separator,
         f"{'Model':<25} {'Train mean':>10} {'Test mean ± sd':>16} {'Fit mean':>10} {'SV mean':>9}",
         f"{result.classical.name:<25} "
@@ -188,6 +191,12 @@ def _format_study_report(result: StudyResult) -> str:
         ),
     ]
     return "\n".join(rows)
+
+
+def _format_dataset_config(noise: float | None, test_size: float | None) -> str:
+    if noise is None or test_size is None:
+        return "Dataset configuration: custom split"
+    return f"Dataset configuration: noise {noise:g} | test split {test_size:g}"
 
 
 def _write_artifact(

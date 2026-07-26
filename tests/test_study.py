@@ -21,6 +21,8 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
 
     assert result.samples == 24
     assert result.features == 2
+    assert result.noise == 0.1
+    assert result.test_size == 0.25
     assert result.seeds == (7, 8, 9)
     assert result.feature_map_reps == 1
     assert len(result.benchmarks) == 3
@@ -39,7 +41,10 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     assert result.quantum.fit_seconds_mean >= 0
     payload = json.loads(json.dumps(result.as_dict()))
     assert payload["seeds"] == [7, 8, 9]
+    assert payload["noise"] == 0.1
+    assert payload["test_size"] == 0.25
     assert all("quantum_advantage" in benchmark for benchmark in payload["benchmarks"])
+    assert all(benchmark["noise"] == 0.1 for benchmark in payload["benchmarks"])
     assert payload["schema_version"] == 1
     assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
 

@@ -18,6 +18,9 @@ def test_make_moons_split_is_reproducible_and_scaled() -> None:
     assert first.train_features.shape == (30, 2)
     assert first.test_features.shape == (10, 2)
     assert first.num_features == 2
+    assert first.noise == 0.12
+    assert first.test_size == 0.25
+    assert first.seed == 7
     assert np.all(first.train_features >= 0)
     assert np.all(first.train_features <= np.pi)
     assert np.all(first.test_features >= 0)
@@ -30,9 +33,12 @@ def test_make_moons_split_is_reproducible_and_scaled() -> None:
     ("kwargs", "message"),
     [
         ({"samples": 7}, "samples must be at least 8"),
-        ({"noise": -0.01}, "noise must be non-negative"),
+        ({"noise": -0.01}, "noise must be a finite non-negative number"),
+        ({"noise": float("nan")}, "noise must be a finite non-negative number"),
+        ({"noise": float("inf")}, "noise must be a finite non-negative number"),
         ({"test_size": 0}, "test_size must be between 0 and 1"),
         ({"test_size": 1}, "test_size must be between 0 and 1"),
+        ({"test_size": float("nan")}, "test_size must be between 0 and 1"),
         ({"seed": -1}, "seed must be between 0 and 4294967295"),
         ({"seed": 2**32}, "seed must be between 0 and 4294967295"),
         (

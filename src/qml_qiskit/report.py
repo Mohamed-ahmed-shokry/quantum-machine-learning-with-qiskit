@@ -59,7 +59,11 @@ def render_html_report(result: BenchmarkResult | StudyResult) -> str:
     h1 {{ margin: .35rem 0 .65rem; font-size: clamp(2rem, 6vw, 4rem); line-height: 1; }}
     h2 {{ margin-top: 0; font-size: 1.15rem; }}
     p {{ color: var(--muted); }}
-    .grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }}
+    .grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }}
     .card {{
       background: linear-gradient(145deg, var(--panel-2), var(--panel));
       border: 1px solid var(--line);
@@ -122,6 +126,8 @@ def _render_benchmark(result: BenchmarkResult) -> str:
   <section class="grid">
     {_metric_card("Samples", str(result.samples))}
     {_metric_card("Seed", str(result.seed))}
+    {_metric_card("Noise", _format_optional(result.noise))}
+    {_metric_card("Test split", _format_optional(result.test_size))}
     {_metric_card("Quantum delta", f"{delta:+.3f}")}
   </section>
   <section class="card">
@@ -158,6 +164,8 @@ def _render_study(result: StudyResult) -> str:
   <section class="grid">
     {_metric_card("Paired runs", str(len(result.seeds)))}
     {_metric_card("Seed range", f"{result.seeds[0]}-{result.seeds[-1]}")}
+    {_metric_card("Noise", _format_optional(result.noise))}
+    {_metric_card("Test split", _format_optional(result.test_size))}
     {_metric_card("Mean quantum delta", f"{result.quantum_advantage_mean:+.3f}")}
   </section>
   <section class="card">
@@ -192,6 +200,10 @@ def _metric_card(label: str, value: str) -> str:
         f'<article class="card"><div class="label">{escape(label)}</div>'
         f'<div class="metric">{escape(value)}</div></article>'
     )
+
+
+def _format_optional(value: float | None) -> str:
+    return "custom" if value is None else f"{value:g}"
 
 
 def _score_bar(label: str, score: float, css_class: str) -> str:

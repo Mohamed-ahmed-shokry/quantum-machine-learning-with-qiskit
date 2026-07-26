@@ -42,6 +42,8 @@ def test_run_benchmark_returns_serializable_metrics() -> None:
     assert result.features == 2
     assert result.seed == 11
     assert result.feature_map_reps == 1
+    assert result.noise == 0.12
+    assert result.test_size == 0.25
     assert 0 <= result.classical.train_accuracy <= 1
     assert 0 <= result.classical.test_accuracy <= 1
     assert 0 <= result.quantum.train_accuracy <= 1
@@ -51,7 +53,24 @@ def test_run_benchmark_returns_serializable_metrics() -> None:
     assert result.classical.support_vectors > 0
     assert result.quantum.support_vectors > 0
     assert payload["schema_version"] == 1
+    assert payload["noise"] == 0.12
+    assert payload["test_size"] == 0.25
     assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
     assert payload["quantum_advantage"] == pytest.approx(
         result.quantum.test_accuracy - result.classical.test_accuracy
     )
+
+
+def test_run_benchmark_rejects_mismatched_dataset_seed() -> None:
+    data = make_moons_split(samples=20, seed=7)
+
+    with pytest.raises(ValueError, match="seed must match the dataset seed"):
+        run_benchmark(data, seed=8, feature_map_reps=1)
+
+
+def test_run_benchmark_inherits_generated_dataset_seed() -> None:
+    data = make_moons_split(samples=20, seed=7)
+
+    result = run_benchmark(data, feature_map_reps=1)
+
+    assert result.seed == 7

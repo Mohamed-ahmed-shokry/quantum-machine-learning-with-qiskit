@@ -95,8 +95,9 @@ qml-qiskit --repeats 10 --samples 60 --seed 42
 ```
 
 Every repeated run is retained in JSON output, so aggregate claims remain
-auditable. Serialized results also include an artifact schema version, Python
-version, platform, and core dependency versions. The packaged
+auditable. Serialized results also include the dataset noise and test split,
+an artifact schema version, Python version, platform, and core dependency
+versions. The packaged
 [JSON Schema](src/qml_qiskit/schemas/result-v1.schema.json) validates both
 single benchmarks and repeated studies:
 

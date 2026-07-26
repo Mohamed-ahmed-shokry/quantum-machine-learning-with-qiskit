@@ -189,6 +189,21 @@
           "type": "integer",
           "minimum": 1
         },
+        "noise": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "test_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
         "classical": {
           "$ref": "#/$defs/modelMetrics"
         },
@@ -233,6 +248,21 @@
         "feature_map_reps": {
           "type": "integer",
           "minimum": 1
+        },
+        "noise": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "test_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
         },
         "classical": {
           "$ref": "#/$defs/modelMetrics"
@@ -294,6 +324,21 @@
         "feature_map_reps": {
           "type": "integer",
           "minimum": 1
+        },
+        "noise": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "test_size": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
         },
         "classical": {
           "$ref": "#/$defs/metricSummary"

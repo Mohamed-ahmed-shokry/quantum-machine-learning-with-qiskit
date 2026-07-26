@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and releases follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Dataset noise and test-split provenance in benchmark and study artifacts,
+  terminal summaries, and HTML reports.
+
+### Changed
+
+- Numeric dataset parameters now reject `NaN` and infinity with clear validation
+  errors.
+- Benchmark runs now reject a model seed that conflicts with a generated
+  dataset's recorded seed.
+
 ## 1.0.0 - 2026-07-24
 
 ### Added
