@@ -135,9 +135,10 @@ qml-qiskit --from-artifact artifacts/ten-seed-study.json \
   --report artifacts/ten-seed-study.html
 ```
 
-Loading validates the packaged JSON Schema and artifact ID before
-reconstructing the result. The regenerated report retains the saved runtime
-provenance rather than describing the machine that renders it.
+Loading validates the packaged JSON Schema, artifact IDs, and cross-field
+semantics before reconstructing the result. Aggregates, paired outcomes,
+configuration, and nested runs must agree. The regenerated report retains the
+saved runtime provenance rather than describing the machine that renders it.
 
 Produce machine-readable output or save an experiment artifact:
 

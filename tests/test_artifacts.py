@@ -1,6 +1,7 @@
 """Tests for loading and reconstructing saved experiment artifacts."""
 
 import json
+from copy import deepcopy
 
 import pytest
 
@@ -14,6 +15,26 @@ from qml_qiskit import (
 from qml_qiskit.metadata import artifact_identifier
 from qml_qiskit.models import BenchmarkResult
 from qml_qiskit.study import StudyResult
+
+
+def _reseal(payload: dict[str, object]) -> None:
+    benchmarks = payload.get("benchmarks")
+    if isinstance(benchmarks, list):
+        for benchmark in benchmarks:
+            benchmark_content = {
+                key: value for key, value in benchmark.items() if key != "artifact_id"
+            }
+            benchmark["artifact_id"] = artifact_identifier(benchmark_content)
+    content = {
+        key: value
+        for key, value in payload.items()
+        if key not in {"artifact_id", "runtime", "schema_version"}
+    }
+    payload["artifact_id"] = artifact_identifier(content)
+
+
+def _different_number(value: float) -> float:
+    return 0.0 if value != 0 else 1.0
 
 
 def test_load_benchmark_preserves_result_and_saved_runtime(tmp_path) -> None:
@@ -104,3 +125,58 @@ def test_load_artifact_rejects_malformed_files(tmp_path, content, message) -> No
 def test_load_artifact_reports_read_failure(tmp_path) -> None:
     with pytest.raises(ArtifactLoadError, match="could not read artifact"):
         load_artifact(tmp_path / "missing.json")
+
+
+def test_load_artifact_rejects_resealed_benchmark_inconsistency(tmp_path) -> None:
+    result = run_benchmark(make_moons_split(samples=20), feature_map_reps=1)
+    payload = result.as_dict()
+    payload["quantum_advantage"] = _different_number(payload["quantum_advantage"])
+    _reseal(payload)
+    path = tmp_path / "inconsistent-benchmark.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(
+        ArtifactLoadError,
+        match=r"semantic validation failed: benchmark\.quantum_advantage",
+    ):
+        load_artifact(path)
+
+
+def test_load_artifact_rejects_resealed_study_inconsistencies(tmp_path) -> None:
+    result = run_study(samples=20, base_seed=7, runs=2, feature_map_reps=1)
+    base_payload = result.as_dict()
+    cases: list[tuple[dict[str, object], str]] = []
+
+    payload = deepcopy(base_payload)
+    payload["seeds"][0] += 100
+    cases.append((payload, r"benchmarks\[0\]\.seed"))
+
+    payload = deepcopy(base_payload)
+    payload["samples"] += 1
+    cases.append((payload, r"benchmarks\[0\]\.samples"))
+
+    payload = deepcopy(base_payload)
+    payload["quantum_wins"] += 1
+    cases.append((payload, "quantum_wins"))
+
+    payload = deepcopy(base_payload)
+    payload["quantum_advantage_mean"] = _different_number(payload["quantum_advantage_mean"])
+    cases.append((payload, "quantum_advantage_mean"))
+
+    payload = deepcopy(base_payload)
+    payload["classical"]["test_accuracy_mean"] = _different_number(
+        payload["classical"]["test_accuracy_mean"]
+    )
+    cases.append((payload, r"classical\.test_accuracy_mean"))
+
+    payload = deepcopy(base_payload)
+    payload["sign_test_pvalue"] = _different_number(payload["sign_test_pvalue"])
+    cases.append((payload, "sign_test_pvalue"))
+
+    for index, (payload, message) in enumerate(cases):
+        _reseal(payload)
+        path = tmp_path / f"inconsistent-study-{index}.json"
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with pytest.raises(ArtifactLoadError, match=message):
+            load_artifact(path)

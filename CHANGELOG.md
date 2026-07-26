@@ -21,6 +21,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Artifact loading now rejects schema-valid, correctly resealed files when
+  aggregates, outcomes, configuration, or nested benchmark fields disagree.
 - Numeric dataset parameters now reject `NaN` and infinity with clear validation
   errors.
 - Benchmark runs now reject a model seed that conflicts with a generated
