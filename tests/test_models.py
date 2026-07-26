@@ -1,5 +1,8 @@
 """Tests for the classical and quantum benchmark models."""
 
+from dataclasses import replace
+
+import numpy as np
 import pytest
 
 from qml_qiskit import make_moons_split
@@ -74,3 +77,17 @@ def test_run_benchmark_inherits_generated_dataset_seed() -> None:
     result = run_benchmark(data, feature_map_reps=1)
 
     assert result.seed == 7
+
+
+def test_run_benchmark_validates_custom_split_before_model_construction() -> None:
+    data = replace(make_moons_split(samples=20, seed=7), train_features=np.zeros(15))
+
+    with pytest.raises(ValueError, match="feature arrays must be two-dimensional"):
+        run_benchmark(data, feature_map_reps=1)
+
+
+def test_run_benchmark_rejects_invalid_explicit_seed() -> None:
+    data = replace(make_moons_split(samples=20), seed=None)
+
+    with pytest.raises(ValueError, match="seed must be between 0 and 4294967295"):
+        run_benchmark(data, seed=-1, feature_map_reps=1)

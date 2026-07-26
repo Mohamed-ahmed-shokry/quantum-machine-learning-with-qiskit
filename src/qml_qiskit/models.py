@@ -12,7 +12,7 @@ from qiskit_machine_learning.algorithms import QSVC
 from qiskit_machine_learning.kernels import FidelityStatevectorKernel
 from sklearn.svm import SVC
 
-from qml_qiskit.data import DatasetSplit
+from qml_qiskit.data import MAX_RANDOM_SEED, DatasetSplit
 from qml_qiskit.metadata import ARTIFACT_SCHEMA_VERSION, runtime_metadata
 
 
@@ -88,8 +88,11 @@ def run_benchmark(
 ) -> BenchmarkResult:
     """Fit a classical RBF SVC and an exact quantum-kernel SVC on one split."""
 
+    data.validate()
     if seed is None:
         seed = data.seed if data.seed is not None else 42
+    if not isinstance(seed, int) or isinstance(seed, bool) or not 0 <= seed <= MAX_RANDOM_SEED:
+        raise ValueError(f"seed must be between 0 and {MAX_RANDOM_SEED}")
     if data.seed is not None and seed != data.seed:
         raise ValueError(f"seed must match the dataset seed ({data.seed})")
 

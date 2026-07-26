@@ -19,6 +19,9 @@ All notable changes to this project are documented here. The format follows
   dataset's recorded seed.
 - JSON and HTML outputs are written atomically, and the CLI rejects conflicting
   output paths instead of silently overwriting one artifact with the other.
+- Custom `DatasetSplit` instances are validated before model construction,
+  producing direct errors for malformed arrays, invalid binary labels, and
+  inconsistent provenance.
 
 ## 1.0.0 - 2026-07-24
 

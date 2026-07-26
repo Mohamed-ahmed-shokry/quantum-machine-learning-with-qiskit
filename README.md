@@ -140,6 +140,10 @@ schema = load_artifact_schema()
 html = render_html_report(study)
 ```
 
+`run_benchmark` validates custom `DatasetSplit` instances before model
+construction, so malformed shapes, non-finite features, invalid binary labels,
+and inconsistent provenance fail with actionable errors.
+
 ## Run the notebooks
 
 Install the notebook extras and launch JupyterLab:
