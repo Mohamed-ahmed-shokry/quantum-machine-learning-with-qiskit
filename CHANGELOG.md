@@ -12,6 +12,8 @@ All notable changes to this project are documented here. The format follows
   terminal summaries, and HTML reports.
 - Content-derived SHA-256 identifiers shared by JSON, terminal, and HTML
   representations of the same measured run.
+- Public API and CLI verification for detecting missing, altered, or malformed
+  saved artifact identifiers without rerunning an experiment.
 
 ### Changed
 

@@ -1,5 +1,6 @@
 """Tests for serialized experiment environment metadata."""
 
+from copy import deepcopy
 from importlib.metadata import PackageNotFoundError
 
 import qml_qiskit.metadata as metadata
@@ -14,6 +15,23 @@ def test_artifact_identifier_is_stable_and_content_derived() -> None:
     assert first != changed
     assert len(first) == 64
     assert set(first) <= set("0123456789abcdef")
+
+
+def test_verify_artifact_identifier_checks_nested_measured_content() -> None:
+    benchmark: dict[str, object] = {"score": 0.75}
+    benchmark["artifact_id"] = metadata.artifact_identifier(benchmark)
+    study: dict[str, object] = {"benchmarks": [benchmark], "runs": 1}
+    study["artifact_id"] = metadata.artifact_identifier(study)
+    study["schema_version"] = 1
+    study["runtime"] = {"python": "test"}
+
+    assert metadata.verify_artifact_identifier(study)
+
+    changed = deepcopy(study)
+    changed["benchmarks"][0]["score"] = 0.5
+    assert not metadata.verify_artifact_identifier(changed)
+    assert not metadata.verify_artifact_identifier({"score": 0.75})
+    assert not metadata.verify_artifact_identifier({"score": float("nan"), "artifact_id": "0" * 64})
 
 
 def test_runtime_metadata_tracks_reproducibility_dependencies() -> None:

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import platform
+from collections.abc import Mapping
 from hashlib import sha256
+from hmac import compare_digest
 from importlib import resources
 from importlib.metadata import PackageNotFoundError, version
 from typing import cast
@@ -30,6 +32,34 @@ def artifact_identifier(payload: object) -> str:
         sort_keys=True,
     )
     return sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def verify_artifact_identifier(payload: Mapping[str, object]) -> bool:
+    """Return whether an artifact ID matches its measured, non-runtime content."""
+
+    claimed_identifier = payload.get("artifact_id")
+    if not isinstance(claimed_identifier, str):
+        return False
+
+    content = dict(payload)
+    content.pop("artifact_id")
+    content.pop("schema_version", None)
+    content.pop("runtime", None)
+    benchmarks = content.get("benchmarks")
+    if benchmarks is not None and (
+        not isinstance(benchmarks, list)
+        or not all(
+            isinstance(benchmark, Mapping) and verify_artifact_identifier(benchmark)
+            for benchmark in benchmarks
+        )
+    ):
+        return False
+
+    try:
+        expected_identifier = artifact_identifier(content)
+    except (TypeError, ValueError):
+        return False
+    return compare_digest(claimed_identifier, expected_identifier)
 
 
 def runtime_metadata() -> dict[str, object]:

@@ -5,14 +5,17 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from collections.abc import Sequence
 from contextlib import suppress
 from math import isfinite
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import cast
 
 from qml_qiskit import __version__
 from qml_qiskit.data import make_moons_split
+from qml_qiskit.metadata import verify_artifact_identifier
 from qml_qiskit.models import BenchmarkResult, run_benchmark
 from qml_qiskit.report import render_html_report
 from qml_qiskit.study import StudyResult, run_study
@@ -68,6 +71,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="save a self-contained HTML experiment report",
     )
+    parser.add_argument(
+        "--verify-artifact",
+        type=Path,
+        metavar="PATH",
+        help="verify a saved artifact ID without running a benchmark",
+    )
     return parser
 
 
@@ -77,6 +86,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     _validate_args(parser, args)
+    if args.verify_artifact is not None:
+        return _verify_artifact(parser, args.verify_artifact)
     result: BenchmarkResult | StudyResult
 
     try:
@@ -115,6 +126,23 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.verify_artifact is not None:
+        if any(
+            (
+                args.samples != 60,
+                args.noise != 0.12,
+                args.test_size != 0.25,
+                args.seed != 42,
+                args.repeats != 1,
+                args.feature_map_reps != 2,
+                args.as_json,
+                args.output is not None,
+                args.report is not None,
+            )
+        ):
+            parser.error("--verify-artifact cannot be combined with benchmark or output options")
+        return
+
     if args.samples < 8:
         parser.error("--samples must be at least 8")
     if not isfinite(args.noise) or args.noise < 0:
@@ -131,6 +159,31 @@ def _validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) ->
         and args.output.resolve() == args.report.resolve()
     ):
         parser.error("--output and --report must use different paths")
+
+
+def _verify_artifact(parser: argparse.ArgumentParser, path: Path) -> int:
+    try:
+        serialized = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as error:
+        parser.error(f"could not read --verify-artifact {path}: {error}")
+    try:
+        loaded = json.loads(serialized)
+    except json.JSONDecodeError as error:
+        parser.error(f"invalid JSON in --verify-artifact {path}: {error}")
+    if not isinstance(loaded, dict):
+        parser.error(f"--verify-artifact {path} must contain a JSON object")
+
+    payload = cast(dict[str, object], loaded)
+    claimed_identifier = payload.get("artifact_id")
+    if not isinstance(claimed_identifier, str):
+        print(f"{path}: missing artifact_id", file=sys.stderr)
+        return 1
+    if not verify_artifact_identifier(payload):
+        print(f"{path}: artifact_id does not match measured content", file=sys.stderr)
+        return 1
+
+    print(f"{path}: verified artifact {claimed_identifier}")
+    return 0
 
 
 def _format_report(result: BenchmarkResult | StudyResult) -> str:

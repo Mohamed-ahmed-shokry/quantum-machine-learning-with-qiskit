@@ -111,6 +111,17 @@ Generating both files in one invocation guarantees that their measured scores
 and timings come from the same run. Each output carries the same content-derived
 SHA-256 artifact ID, making the pair easy to verify.
 
+Verify a saved JSON artifact without rerunning either model:
+
+```bash
+qml-qiskit --verify-artifact artifacts/ten-seed-study.json
+```
+
+Verification exits with status 1 when the ID is missing or no longer matches
+the measured content, and status 2 when the file cannot be read or parsed.
+The ID detects accidental content changes; it is not a signature or proof of
+who produced the artifact.
+
 Produce machine-readable output or save an experiment artifact:
 
 ```bash
@@ -127,6 +138,7 @@ from qml_qiskit import (
     render_html_report,
     run_benchmark,
     run_study,
+    verify_artifact_identifier,
 )
 
 data = make_moons_split(samples=60, seed=42)
@@ -134,6 +146,7 @@ result = run_benchmark(data, seed=42, feature_map_reps=2)
 
 print(result.quantum.test_accuracy)
 print(result.as_dict())
+assert verify_artifact_identifier(result.as_dict())
 
 study = run_study(samples=60, base_seed=42, runs=10)
 print(study.quantum.test_accuracy_mean)
