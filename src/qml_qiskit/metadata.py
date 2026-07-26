@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import platform
+from hashlib import sha256
 from importlib import resources
 from importlib.metadata import PackageNotFoundError, version
 from typing import cast
@@ -16,6 +17,19 @@ TRACKED_PACKAGES = (
     "numpy",
     "scikit-learn",
 )
+
+
+def artifact_identifier(payload: object) -> str:
+    """Return a stable SHA-256 identifier for JSON-serializable artifact content."""
+
+    canonical = json.dumps(
+        payload,
+        allow_nan=False,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def runtime_metadata() -> dict[str, object]:

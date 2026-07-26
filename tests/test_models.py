@@ -58,10 +58,19 @@ def test_run_benchmark_returns_serializable_metrics() -> None:
     assert payload["schema_version"] == 1
     assert payload["noise"] == 0.12
     assert payload["test_size"] == 0.25
+    assert payload["artifact_id"] == result.artifact_id
+    assert len(result.artifact_id) == 64
     assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
     assert payload["quantum_advantage"] == pytest.approx(
         result.quantum.test_accuracy - result.classical.test_accuracy
     )
+
+
+def test_benchmark_artifact_id_changes_with_measured_content() -> None:
+    result = run_benchmark(make_moons_split(samples=20), feature_map_reps=1)
+    changed = replace(result, seed=43)
+
+    assert result.artifact_id != changed.artifact_id
 
 
 def test_run_benchmark_rejects_mismatched_dataset_seed() -> None:

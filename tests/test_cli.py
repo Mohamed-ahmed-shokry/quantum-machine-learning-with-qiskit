@@ -39,6 +39,7 @@ def test_cli_prints_json_and_writes_result(tmp_path, capsys) -> None:
     assert printed["seed"] == 9
     assert printed["noise"] == 0.12
     assert printed["test_size"] == 0.25
+    assert len(printed["artifact_id"]) == 64
     assert printed["classical"]["name"] == "Classical RBF SVC"
     assert printed["quantum"]["name"] == "Quantum fidelity QSVC"
 
@@ -49,6 +50,7 @@ def test_cli_prints_readable_report(capsys) -> None:
 
     assert exit_code == 0
     assert "QML benchmark | 20 samples" in output
+    assert "Artifact ID:" in output
     assert "Dataset configuration: noise 0.12 | test split 0.25" in output
     assert "Classical RBF SVC" in output
     assert "Quantum fidelity QSVC" in output
@@ -84,6 +86,7 @@ def test_cli_prints_readable_study_report(capsys) -> None:
 
     assert exit_code == 0
     assert "QML study | 20 samples | 2 paired runs" in output
+    assert "Artifact ID:" in output
     assert "Dataset configuration: noise 0.12 | test split 0.25" in output
     assert "Test mean ± sd" in output
     assert "Paired outcomes (quantum / tie / classical):" in output
@@ -116,8 +119,9 @@ def test_cli_rejects_conflicting_artifact_paths(tmp_path, capsys) -> None:
     assert "--output and --report must use different paths" in capsys.readouterr().err
 
 
-def test_cli_writes_html_study_report(tmp_path, capsys) -> None:
+def test_cli_writes_matching_json_and_html_study_artifacts(tmp_path, capsys) -> None:
     report_path = tmp_path / "reports" / "study.html"
+    output_path = tmp_path / "artifacts" / "study.json"
 
     exit_code = main(
         [
@@ -127,17 +131,21 @@ def test_cli_writes_html_study_report(tmp_path, capsys) -> None:
             "1",
             "--repeats",
             "2",
+            "--output",
+            str(output_path),
             "--report",
             str(report_path),
         ]
     )
     report = report_path.read_text(encoding="utf-8")
+    artifact = json.loads(output_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0
     assert "QML study" in capsys.readouterr().out
     assert report.startswith("<!doctype html>")
     assert "Paired run audit" in report
     assert "Responsible interpretation" in report
+    assert artifact["artifact_id"] in report
 
 
 @pytest.mark.parametrize(

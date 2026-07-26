@@ -147,6 +147,7 @@ def _format_benchmark_report(result: BenchmarkResult) -> str:
     separator = "-" * len(header)
     rows = [
         header,
+        f"Artifact ID: {result.artifact_id}",
         _format_dataset_config(result.noise, result.test_size),
         separator,
         f"{'Model':<25} {'Train':>8} {'Test':>8} {'Fit (s)':>10} {'SVs':>6}",
@@ -174,6 +175,7 @@ def _format_study_report(result: StudyResult) -> str:
     separator = "-" * len(header)
     rows = [
         header,
+        f"Artifact ID: {result.artifact_id}",
         _format_dataset_config(result.noise, result.test_size),
         separator,
         f"{'Model':<25} {'Train mean':>10} {'Test mean ± sd':>16} {'Fit mean':>10} {'SV mean':>9}",

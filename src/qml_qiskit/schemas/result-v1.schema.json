@@ -214,6 +214,10 @@
           "type": "number",
           "minimum": -1,
           "maximum": 1
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         }
       }
     },
@@ -274,6 +278,10 @@
           "type": "number",
           "minimum": -1,
           "maximum": 1
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         },
         "schema_version": {
           "const": 1
@@ -366,6 +374,10 @@
         "classical_wins": {
           "type": "integer",
           "minimum": 0
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         },
         "benchmarks": {
           "type": "array",

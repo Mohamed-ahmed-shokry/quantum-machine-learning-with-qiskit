@@ -10,6 +10,8 @@ All notable changes to this project are documented here. The format follows
 
 - Dataset noise and test-split provenance in benchmark and study artifacts,
   terminal summaries, and HTML reports.
+- Content-derived SHA-256 identifiers shared by JSON, terminal, and HTML
+  representations of the same measured run.
 
 ### Changed
 

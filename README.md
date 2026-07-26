@@ -103,10 +103,13 @@ single benchmarks and repeated studies:
 
 ```bash
 qml-qiskit --repeats 10 --json \
-  --output artifacts/ten-seed-study.json
-qml-qiskit --repeats 10 \
+  --output artifacts/ten-seed-study.json \
   --report artifacts/ten-seed-study.html
 ```
+
+Generating both files in one invocation guarantees that their measured scores
+and timings come from the same run. Each output carries the same content-derived
+SHA-256 artifact ID, making the pair easy to verify.
 
 Produce machine-readable output or save an experiment artifact:
 

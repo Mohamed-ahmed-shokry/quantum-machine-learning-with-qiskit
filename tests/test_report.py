@@ -16,6 +16,7 @@ def test_benchmark_report_contains_metrics_and_provenance() -> None:
     assert "0.12" in report
     assert "Test split" in report
     assert "0.25" in report
+    assert result.artifact_id in report
     assert 'role="img"' in report
     assert "qml-qiskit 1.0.0" in report
     assert "Responsible interpretation" in report
@@ -30,6 +31,7 @@ def test_study_report_contains_paired_run_audit() -> None:
     assert "2-3" in report
     assert "Noise" in report
     assert "Test split" in report
+    assert result.artifact_id in report
     assert "<h2>Paired run audit</h2>" in report
     assert "Quantum wins" in report
     assert "Population standard deviation:" in report

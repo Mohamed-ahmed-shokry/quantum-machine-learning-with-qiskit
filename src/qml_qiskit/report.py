@@ -87,6 +87,7 @@ def render_html_report(result: BenchmarkResult | StudyResult) -> str:
     .note {{ border-left: 3px solid var(--quantum); }}
     footer {{ color: var(--muted); font-size: .8rem; margin-top: 2rem; }}
     code {{ color: #d8d0ff; }}
+    .artifact {{ overflow-wrap: anywhere; }}
     @media (max-width: 720px) {{
       .grid {{ grid-template-columns: 1fr; }}
       .table-wrap {{ overflow-x: auto; }}
@@ -100,6 +101,7 @@ def render_html_report(result: BenchmarkResult | StudyResult) -> str:
     <div class="eyebrow">Quantum machine learning · Qiskit</div>
     <h1>Experiment report</h1>
     <p>Paired classical and quantum-kernel classification on a reproducible nonlinear dataset.</p>
+    <p class="artifact">Artifact ID <code>{escape(result.artifact_id)}</code></p>
   </header>
   {body}
   <section class="card note">

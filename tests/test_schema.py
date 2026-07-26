@@ -42,6 +42,15 @@ def test_schema_rejects_out_of_range_accuracy(validator: Draft202012Validator) -
         validator.validate(artifact)
 
 
+def test_schema_rejects_malformed_artifact_id(validator: Draft202012Validator) -> None:
+    data = make_moons_split(samples=20, seed=3)
+    artifact = run_benchmark(data, seed=3, feature_map_reps=1).as_dict()
+    artifact["artifact_id"] = "not-a-sha256"
+
+    with pytest.raises(ValidationError):
+        validator.validate(artifact)
+
+
 def test_schema_remains_compatible_with_existing_v1_artifacts(
     validator: Draft202012Validator,
 ) -> None:
@@ -53,8 +62,10 @@ def test_schema_remains_compatible_with_existing_v1_artifacts(
     ).as_dict()
     artifact.pop("noise")
     artifact.pop("test_size")
+    artifact.pop("artifact_id")
     for benchmark in artifact["benchmarks"]:
         benchmark.pop("noise")
         benchmark.pop("test_size")
+        benchmark.pop("artifact_id")
 
     validator.validate(artifact)

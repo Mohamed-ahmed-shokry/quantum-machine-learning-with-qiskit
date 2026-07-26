@@ -13,7 +13,11 @@ from qiskit_machine_learning.kernels import FidelityStatevectorKernel
 from sklearn.svm import SVC
 
 from qml_qiskit.data import MAX_RANDOM_SEED, DatasetSplit
-from qml_qiskit.metadata import ARTIFACT_SCHEMA_VERSION, runtime_metadata
+from qml_qiskit.metadata import (
+    ARTIFACT_SCHEMA_VERSION,
+    artifact_identifier,
+    runtime_metadata,
+)
 
 
 class _Classifier(Protocol):
@@ -52,13 +56,24 @@ class BenchmarkResult:
 
         return self.quantum.test_accuracy - self.classical.test_accuracy
 
+    @property
+    def artifact_id(self) -> str:
+        """Return a stable identifier for this measured benchmark."""
+
+        return artifact_identifier(self._content_dict())
+
     def as_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable representation."""
 
-        payload = asdict(self)
-        payload["quantum_advantage"] = self.quantum_advantage
+        payload = self._content_dict()
+        payload["artifact_id"] = artifact_identifier(payload)
         payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
         payload["runtime"] = runtime_metadata()
+        return payload
+
+    def _content_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["quantum_advantage"] = self.quantum_advantage
         return payload
 
 

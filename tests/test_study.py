@@ -43,8 +43,18 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     assert payload["seeds"] == [7, 8, 9]
     assert payload["noise"] == 0.1
     assert payload["test_size"] == 0.25
+    assert payload["artifact_id"] == result.artifact_id
+    assert len(result.artifact_id) == 64
     assert all("quantum_advantage" in benchmark for benchmark in payload["benchmarks"])
     assert all(benchmark["noise"] == 0.1 for benchmark in payload["benchmarks"])
+    assert all(
+        payload_benchmark["artifact_id"] == benchmark.artifact_id
+        for payload_benchmark, benchmark in zip(
+            payload["benchmarks"],
+            result.benchmarks,
+            strict=True,
+        )
+    )
     assert payload["schema_version"] == 1
     assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
 

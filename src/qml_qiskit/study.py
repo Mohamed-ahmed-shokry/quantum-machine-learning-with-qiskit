@@ -8,7 +8,11 @@ from statistics import fmean, pstdev
 from typing import Any
 
 from qml_qiskit.data import MAX_RANDOM_SEED, make_moons_split
-from qml_qiskit.metadata import ARTIFACT_SCHEMA_VERSION, runtime_metadata
+from qml_qiskit.metadata import (
+    ARTIFACT_SCHEMA_VERSION,
+    artifact_identifier,
+    runtime_metadata,
+)
 from qml_qiskit.models import BenchmarkResult, ModelMetrics, run_benchmark
 
 
@@ -47,20 +51,32 @@ class StudyResult:
     noise: float | None = None
     test_size: float | None = None
 
+    @property
+    def artifact_id(self) -> str:
+        """Return a stable identifier for this complete paired study."""
+
+        return artifact_identifier(self._content_dict())
+
     def as_dict(self) -> dict[str, Any]:
         """Return the complete study as a JSON-serializable mapping."""
 
+        payload = self._content_dict()
+        payload["artifact_id"] = artifact_identifier(payload)
+        payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
+        payload["runtime"] = runtime_metadata()
+        return payload
+
+    def _content_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["seeds"] = list(self.seeds)
         payload["benchmarks"] = [
             {
                 **asdict(benchmark),
                 "quantum_advantage": benchmark.quantum_advantage,
+                "artifact_id": benchmark.artifact_id,
             }
             for benchmark in self.benchmarks
         ]
-        payload["schema_version"] = ARTIFACT_SCHEMA_VERSION
-        payload["runtime"] = runtime_metadata()
         return payload
 
 
