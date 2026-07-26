@@ -184,6 +184,15 @@ def _render_study(result: StudyResult) -> str:
     {_metric_card("Quantum wins", str(result.quantum_wins))}
     {_metric_card("Ties", str(result.ties))}
     {_metric_card("Classical wins", str(result.classical_wins))}
+    {_metric_card("Sign-test p", f"{result.sign_test_pvalue:.4g}")}
+  </section>
+  <section class="card note">
+    <h2>Paired sign test</h2>
+    <p>
+      The exact two-sided sign test excludes ties and tests whether either model wins
+      more often across the selected seeds. It does not measure effect size or establish
+      practical quantum advantage.
+    </p>
   </section>
   <section class="card table-wrap">
     <h2>Paired run audit</h2>

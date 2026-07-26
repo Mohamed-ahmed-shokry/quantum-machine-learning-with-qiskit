@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from math import isclose
+from math import comb, isclose
 from statistics import fmean, pstdev
 from typing import Any
 
@@ -50,6 +50,7 @@ class StudyResult:
     benchmarks: tuple[BenchmarkResult, ...]
     noise: float | None = None
     test_size: float | None = None
+    sign_test_pvalue: float = 1.0
 
     @property
     def artifact_id(self) -> str:
@@ -137,7 +138,19 @@ def run_study(
         ties=ties,
         classical_wins=classical_wins,
         benchmarks=benchmarks,
+        sign_test_pvalue=_two_sided_sign_test_pvalue(quantum_wins, classical_wins),
     )
+
+
+def _two_sided_sign_test_pvalue(quantum_wins: int, classical_wins: int) -> float:
+    """Return the exact two-sided sign-test p-value, excluding tied pairs."""
+
+    non_tied_runs = quantum_wins + classical_wins
+    if non_tied_runs == 0:
+        return 1.0
+    smaller_count = min(quantum_wins, classical_wins)
+    lower_tail = sum(comb(non_tied_runs, count) for count in range(smaller_count + 1))
+    return float(min(1.0, (2 * lower_tail) / (2**non_tied_runs)))
 
 
 def _summarize(metrics: tuple[ModelMetrics, ...]) -> MetricSummary:

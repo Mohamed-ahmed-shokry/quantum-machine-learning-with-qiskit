@@ -5,7 +5,7 @@ from statistics import fmean, pstdev
 
 import pytest
 
-from qml_qiskit.study import run_study
+from qml_qiskit.study import _two_sided_sign_test_pvalue, run_study
 
 
 def test_run_study_aggregates_paired_benchmarks() -> None:
@@ -29,6 +29,11 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     assert result.classical.runs == 3
     assert result.quantum.runs == 3
     assert result.quantum_wins + result.ties + result.classical_wins == 3
+    assert result.sign_test_pvalue == _two_sided_sign_test_pvalue(
+        result.quantum_wins,
+        result.classical_wins,
+    )
+    assert 0 <= result.sign_test_pvalue <= 1
     assert result.quantum_advantage_mean == pytest.approx(fmean(advantages))
     assert result.quantum_advantage_std == pytest.approx(pstdev(advantages))
     assert result.classical.test_accuracy_mean == pytest.approx(
@@ -43,6 +48,7 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     assert payload["seeds"] == [7, 8, 9]
     assert payload["noise"] == 0.1
     assert payload["test_size"] == 0.25
+    assert payload["sign_test_pvalue"] == result.sign_test_pvalue
     assert payload["artifact_id"] == result.artifact_id
     assert len(result.artifact_id) == 64
     assert all("quantum_advantage" in benchmark for benchmark in payload["benchmarks"])
@@ -57,6 +63,25 @@ def test_run_study_aggregates_paired_benchmarks() -> None:
     )
     assert payload["schema_version"] == 1
     assert payload["runtime"]["packages"]["qml-qiskit"] == "1.0.0"
+
+
+@pytest.mark.parametrize(
+    ("quantum_wins", "classical_wins", "expected"),
+    [
+        (0, 0, 1.0),
+        (1, 0, 1.0),
+        (2, 0, 0.5),
+        (2, 2, 1.0),
+        (10, 0, 0.001953125),
+        (9, 1, 0.021484375),
+    ],
+)
+def test_two_sided_sign_test_is_exact(
+    quantum_wins: int,
+    classical_wins: int,
+    expected: float,
+) -> None:
+    assert _two_sided_sign_test_pvalue(quantum_wins, classical_wins) == expected
 
 
 def test_run_study_rejects_single_run() -> None:

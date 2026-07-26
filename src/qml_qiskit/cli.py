@@ -253,6 +253,7 @@ def _format_study_report(result: StudyResult) -> str:
             "Mean quantum test-score delta: "
             f"{result.quantum_advantage_mean:+.3f} ± {result.quantum_advantage_std:.3f}"
         ),
+        f"Exact paired sign-test p-value: {result.sign_test_pvalue:.4g}",
     ]
     return "\n".join(rows)
 

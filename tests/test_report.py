@@ -34,6 +34,8 @@ def test_study_report_contains_paired_run_audit() -> None:
     assert result.artifact_id in report
     assert "<h2>Paired run audit</h2>" in report
     assert "Quantum wins" in report
+    assert "Sign-test p" in report
+    assert "Paired sign test" in report
     assert "Population standard deviation:" in report
 
 

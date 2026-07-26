@@ -140,6 +140,7 @@ def test_cli_prints_repeated_study_json(capsys) -> None:
     assert result["classical"]["runs"] == 2
     assert result["quantum"]["runs"] == 2
     assert len(result["benchmarks"]) == 2
+    assert 0 <= result["sign_test_pvalue"] <= 1
 
 
 def test_cli_prints_readable_study_report(capsys) -> None:
@@ -153,6 +154,7 @@ def test_cli_prints_readable_study_report(capsys) -> None:
     assert "Test mean ± sd" in output
     assert "Paired outcomes (quantum / tie / classical):" in output
     assert "Mean quantum test-score delta:" in output
+    assert "Exact paired sign-test p-value:" in output
 
 
 def test_cli_reports_output_write_failures(tmp_path, capsys) -> None:

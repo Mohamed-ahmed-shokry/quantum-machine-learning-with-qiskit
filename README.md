@@ -88,11 +88,16 @@ qml-qiskit --samples 80 --noise 0.08 --test-size 0.3 \
 ```
 
 One split can be misleading. Run a paired study over consecutive seeds to
-report mean accuracy, population standard deviation, and win/tie counts:
+report mean accuracy, population standard deviation, win/tie counts, and an
+exact two-sided paired sign-test p-value:
 
 ```bash
 qml-qiskit --repeats 10 --samples 60 --seed 42
 ```
+
+The sign test excludes tied pairs and checks whether either model wins more
+often across the selected seeds. It does not measure the size of the accuracy
+difference, prove practical relevance, or establish quantum advantage.
 
 Every repeated run is retained in JSON output, so aggregate claims remain
 auditable. Serialized results also include the dataset noise and test split,

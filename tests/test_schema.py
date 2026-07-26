@@ -51,6 +51,21 @@ def test_schema_rejects_malformed_artifact_id(validator: Draft202012Validator) -
         validator.validate(artifact)
 
 
+def test_schema_rejects_out_of_range_sign_test_pvalue(
+    validator: Draft202012Validator,
+) -> None:
+    artifact = run_study(
+        samples=20,
+        base_seed=3,
+        runs=2,
+        feature_map_reps=1,
+    ).as_dict()
+    artifact["sign_test_pvalue"] = 1.1
+
+    with pytest.raises(ValidationError):
+        validator.validate(artifact)
+
+
 def test_schema_remains_compatible_with_existing_v1_artifacts(
     validator: Draft202012Validator,
 ) -> None:
@@ -63,6 +78,7 @@ def test_schema_remains_compatible_with_existing_v1_artifacts(
     artifact.pop("noise")
     artifact.pop("test_size")
     artifact.pop("artifact_id")
+    artifact.pop("sign_test_pvalue")
     for benchmark in artifact["benchmarks"]:
         benchmark.pop("noise")
         benchmark.pop("test_size")

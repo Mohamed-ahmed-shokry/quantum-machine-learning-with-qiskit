@@ -14,6 +14,8 @@ All notable changes to this project are documented here. The format follows
   representations of the same measured run.
 - Public API and CLI verification for detecting missing, altered, or malformed
   saved artifact identifiers without rerunning an experiment.
+- Exact two-sided paired sign-test results for repeated studies, surfaced in
+  serialized artifacts, terminal summaries, and HTML reports.
 
 ### Changed
 
